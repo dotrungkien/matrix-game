@@ -6,23 +6,31 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
-    public Text scoreText;
-    private int currentScore;
-    GridManager gridManager;
+    public Text player1Score;
+    public Text player2Score;
+    private int currentPlayer1Score;
+    private int currentPlayer2Score;
+    GameManager gameManager;
 
     void Start()
     {
-        gridManager = GridManager.GetInstance();
-        currentScore = gridManager.totalScore;
-        scoreText.text = "Score: " + currentScore;
+        gameManager = GameManager.GetInstance();
+        currentPlayer1Score = gameManager.player1Score;
+        currentPlayer2Score = gameManager.player2Score;
+        player1Score.text = "Player1: " + currentPlayer1Score;
+        player2Score.text = "Player2: " + currentPlayer2Score;
     }
     void Update()
     {
-        if (gridManager.totalScore != currentScore)
+        if (gameManager.player1Score != currentPlayer1Score)
         {
-            currentScore = gridManager.totalScore;
-            scoreText.text = "Score: " + currentScore;
+            currentPlayer1Score = gameManager.player1Score;
+            player1Score.text = "Player1: " + currentPlayer1Score;
         }
-
+        if (gameManager.player2Score != currentPlayer1Score)
+        {
+            currentPlayer1Score = gameManager.player2Score;
+            player2Score.text = "Player1: " + currentPlayer1Score;
+        }
     }
 }

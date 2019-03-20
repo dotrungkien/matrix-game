@@ -10,14 +10,24 @@ public class Tile : MonoBehaviour
     private Transform myParent;
     private SpriteRenderer tile;
     private int topVal, midVal, botVal;
+    private GridManager gridManager;
+
     public bool movable;
     public Sprite[] renders;
     public SpriteRenderer top;
     public SpriteRenderer mid;
     public SpriteRenderer bot;
 
+    public enum TAG
+    {
+        player1,
+        player2
+    }
+    public TAG tag;
+
     void Start()
     {
+        gridManager = GameObject.Find("Player1").GetComponent<GridManager>();
         movable = true;
         tile = GetComponent<SpriteRenderer>();
         topVal = UnityEngine.Random.Range(7, 10);
@@ -79,6 +89,7 @@ public class Tile : MonoBehaviour
             }
             newPosition = currentCell.position;
         }
+        // if (!currentCell.CompareTag(transform.tag)) return;
         if (currentCell.childCount != 0)
         {
             transform.position = startingPosition;
@@ -97,6 +108,7 @@ public class Tile : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.tag != "Cell") return;
+        if (other.transform.parent.parent.name != transform.tag) return;
         if (!touchingTiles.Contains(other.transform))
         {
             touchingTiles.Add(other.transform);
@@ -106,6 +118,7 @@ public class Tile : MonoBehaviour
     void OnTriggerExit2D(Collider2D other)
     {
         if (other.tag != "Cell") return;
+        if (other.transform.parent.parent.name != transform.tag) return;
         if (touchingTiles.Contains(other.transform))
         {
             touchingTiles.Remove(other.transform);
@@ -123,9 +136,9 @@ public class Tile : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         transform.position = endingPos;
-        int[] cell = GridManager.GetInstance().PosToGrid(endingPos);
+        int[] cell = gridManager.PosToGrid(endingPos);
         // Debug.Log("Place on x= " + cell[0] + ", y= " + cell[1]);
-        GridManager.GetInstance().UpdateGridVal(cell[0], cell[1], topVal, midVal, botVal);
+        gridManager.UpdateGridVal(cell[0], cell[1], topVal, midVal, botVal);
         GameManager.GetInstance().SpawnNewTile();
     }
 }

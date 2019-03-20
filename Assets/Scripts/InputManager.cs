@@ -7,11 +7,6 @@ public class InputManager : MonoBehaviour
     private GameObject draggedObject;
     private Vector2 touchOffset;
 
-
-    void Start()
-    {
-        GameManager.GetInstance().SpawnNewTile();
-    }
     void Update()
     {
         if (Input.GetMouseButton(0))
@@ -49,7 +44,9 @@ public class InputManager : MonoBehaviour
             if (touches.Length > 0)
             {
                 var hit = touches[0];
-                if (hit.transform != null && hit.transform.tag == "Tile")
+                int turn = GameManager.GetInstance().turn;
+                string tag = turn == 0 ? "Player1" : "Player2";
+                if (hit.transform != null && hit.transform.tag == tag)
                 {
                     draggingItem = true;
                     draggedObject = hit.transform.gameObject;

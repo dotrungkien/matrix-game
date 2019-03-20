@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GridManager : Singleton<GridManager>
+public class GridManager : MonoBehaviour
 {
+    public string playerTag;
     public float cellSize = 0.5f;
     int[,] grid = new int[9, 9];
     public int totalScore = 0;
@@ -121,6 +122,7 @@ public class GridManager : Singleton<GridManager>
         }
 
         totalScore = newScore;
+        UpdateScore();
     }
 
     int searchAndMatch(int[] tempList, Dictionary<int, int[]> map)
@@ -150,6 +152,19 @@ public class GridManager : Singleton<GridManager>
             }
         }
         return newScore;
+    }
+
+    public void UpdateScore()
+    {
+        if (playerTag == "Player1")
+        {
+            GameManager.GetInstance().player1Score = totalScore;
+        }
+        if (playerTag == "Player2")
+        {
+            GameManager.GetInstance().player2Score = totalScore;
+        }
+
     }
 
     void DrawLine(Vector3 from, Vector3 to)
