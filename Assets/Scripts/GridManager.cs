@@ -34,8 +34,6 @@ public class GridManager : Singleton<GridManager>
         // GridLog();
     }
 
-
-
     public void UpdateStatus()
     {
         int newScore = 0;
@@ -52,28 +50,6 @@ public class GridManager : Singleton<GridManager>
                 map[j] = new int[] { i, j };
             }
             newScore += searchAndMatch(tempList, map);
-            // int j = 0;
-            // while (j < 8)
-            // {
-            //     if (grid[i, j] == 0 || grid[i, j] != grid[i, j + 1])
-            //     {
-            //         j++;
-            //         if (j > 8) break;
-            //     }
-            //     else
-            //     {
-            //         int k = j;
-            //         while (k < 9 && grid[i, j] == grid[i, k]) k++;
-            //         if (k - j >= 3)
-            //         {
-            //             newScore += grid[i, j] * (k - j);
-            //             Vector3 from = GridToPos(new int[2] { i, j });
-            //             Vector3 to = GridToPos(new int[2] { i, k - 1 });
-            //             DrawLine(from, to);
-            //         }
-            //         j = k;
-            //     }
-            // }
         }
         // Rows
         for (int j = 0; j < dim; j++)
@@ -86,28 +62,6 @@ public class GridManager : Singleton<GridManager>
                 map[i] = new int[] { i, j };
             }
             newScore += searchAndMatch(tempList, map);
-            // int i = 0;
-            // while (i < 8)
-            // {
-            //     if (grid[i, j] == 0 || grid[i, j] != grid[i + 1, j])
-            //     {
-            //         i++;
-            //         if (i > 8) break;
-            //     }
-            //     else
-            //     {
-            //         int k = i + 1;
-            //         while (k < 9 && grid[i, j] == grid[k, j]) k++;
-            //         if (k - i >= 3)
-            //         {
-            //             newScore += grid[i, j] * (k - i);
-            //             Vector3 from = GridToPos(new int[2] { i, j });
-            //             Vector3 to = GridToPos(new int[2] { k - 1, j });
-            //             DrawLine(from, to);
-            //         }
-            //         i = k;
-            //     }
-            // }
         }
         // lower \ diagonal
         for (int k = 2; k < dim; k++)
@@ -121,28 +75,6 @@ public class GridManager : Singleton<GridManager>
                 map[j] = new int[] { i, j };
             }
             newScore += searchAndMatch(tempList, map);
-            // int u = 0;
-            // while (u < k)
-            // {
-            //     if (tempList[u] == 0 || tempList[u] != tempList[u + 1])
-            //     {
-            //         u++;
-            //         if (u > k) break;
-            //     }
-            //     else
-            //     {
-            //         int v = u;
-            //         while (v < k + 1 && tempList[u] == tempList[v]) v++;
-            //         if (v - u >= 3)
-            //         {
-            //             newScore += tempList[u] * (v - u);
-            //             Vector3 from = GridToPos(map[u]);
-            //             Vector3 to = GridToPos(map[v - 1]);
-            //             DrawLine(from, to);
-            //         }
-            //         u = v;
-            //     }
-            // }
         }
         // upper \ diagonal
         for (int k = dim - 2; k >= 2; k--)
@@ -157,29 +89,6 @@ public class GridManager : Singleton<GridManager>
                 map[j] = new int[] { dim - j - 1, dim - i - 1 };
             }
             newScore += searchAndMatch(tempList, map);
-
-            // int u = 0;
-            // while (u < k)
-            // {
-            //     if (tempList[u] == 0 || tempList[u] != tempList[u + 1])
-            //     {
-            //         u++;
-            //         if (u > k) break;
-            //     }
-            //     else
-            //     {
-            //         int v = u;
-            //         while (v < k + 1 && tempList[u] == tempList[v]) v++;
-            //         if (v - u >= 3)
-            //         {
-            //             newScore += tempList[u] * (v - u);
-            //             Vector3 from = GridToPos(map[u]);
-            //             Vector3 to = GridToPos(map[v - 1]);
-            //             DrawLine(from, to);
-            //         }
-            //         u = v;
-            //     }
-            // }
         }
 
         // lower / diagonal
@@ -195,31 +104,6 @@ public class GridManager : Singleton<GridManager>
                 map[j] = new int[] { dim - i - 1, dim - j - 1 };
             }
             newScore += searchAndMatch(tempList, map);
-
-            // Debug.Log(string.Join(" ", tempList));
-
-            // int u = 0;
-            // while (u < k)
-            // {
-            //     if (tempList[u] == 0 || tempList[u] != tempList[u + 1])
-            //     {
-            //         u++;
-            //         if (u > k) break;
-            //     }
-            //     else
-            //     {
-            //         int v = u;
-            //         while (v < k + 1 && tempList[u] == tempList[v]) v++;
-            //         if (v - u >= 3)
-            //         {
-            //             newScore += tempList[u] * (v - u);
-            //             Vector3 from = GridToPos(map[u]);
-            //             Vector3 to = GridToPos(map[v - 1]);
-            //             DrawLine(from, to);
-            //         }
-            //         u = v;
-            //     }
-            // }
         }
 
         // upper / diagonal
@@ -234,28 +118,6 @@ public class GridManager : Singleton<GridManager>
                 map[i] = new int[] { i, j };
             }
             newScore += searchAndMatch(tempList, map);
-            // int u = 0;
-            // while (u < k)
-            // {
-            //     if (tempList[u] == 0 || tempList[u] != tempList[u + 1])
-            //     {
-            //         u++;
-            //         if (u > k) break;
-            //     }
-            //     else
-            //     {
-            //         int v = u;
-            //         while (v < k + 1 && tempList[u] == tempList[v]) v++;
-            //         if (v - u >= 3)
-            //         {
-            //             newScore += tempList[u] * (v - u);
-            //             Vector3 from = GridToPos(map[u]);
-            //             Vector3 to = GridToPos(map[v - 1]);
-            //             DrawLine(from, to);
-            //         }
-            //         u = v;
-            //     }
-            // }
         }
 
         totalScore = newScore;
