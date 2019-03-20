@@ -35,13 +35,13 @@ public class Tile : MonoBehaviour
 
     void Update()
     {
-        if (GameManager.GetInstance().turn != tileType && movable)
+        if ((GameManager.GetInstance().turn != tileType && movable) || GameManager.GetInstance().isGameOver)
         {
             tile.color = Color.gray;
         }
         else
         {
-            tile.color = tileType == 0 ? Color.green : Color.blue;
+            tile.color = tileType == 0 ? new Color(0f, 0.6f, 0f) : new Color(0f, 0f, 0.6f);
         }
     }
 

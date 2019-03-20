@@ -9,6 +9,7 @@ public class InputManager : MonoBehaviour
 
     void Update()
     {
+        if (GameManager.GetInstance().isGameOver) return;
         if (Input.GetMouseButton(0))
         {
             DragOrPickUp();

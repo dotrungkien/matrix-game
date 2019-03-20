@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -11,6 +12,8 @@ public class GameManager : Singleton<GameManager>
     public int player1Score;
     public int player2Score;
     public int turn = 0;
+    public int turnCount = 0;
+    public bool isGameOver = false;
 
     void Start()
     {
@@ -25,6 +28,7 @@ public class GameManager : Singleton<GameManager>
 
     public void SpawnNewTile()
     {
+        turnCount += 1;
         if (turn == 0)
         {
             Instantiate(tile1, spawnPosition1.position, Quaternion.identity, spawnPosition1);
@@ -33,5 +37,18 @@ public class GameManager : Singleton<GameManager>
         {
             Instantiate(tile2, spawnPosition2.position, Quaternion.identity, spawnPosition2);
         }
+    }
+
+    public void GameOver()
+    {
+        isGameOver = true;
+    }
+
+    public void Restart()
+    {
+        turn = 0;
+        turnCount = 0;
+        isGameOver = false;
+        SceneManager.LoadScene("Game");
     }
 }

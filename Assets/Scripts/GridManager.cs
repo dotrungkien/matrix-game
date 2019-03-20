@@ -8,6 +8,7 @@ public class GridManager : MonoBehaviour
     public float cellSize = 0.5f;
     int[,] grid = new int[9, 9];
     public int totalScore = 0;
+    public GameUI gameUI;
 
     public int[] PosToGrid(Vector2 pos)
     {
@@ -123,7 +124,15 @@ public class GridManager : MonoBehaviour
 
         totalScore = newScore;
         UpdateScore();
-        GameManager.GetInstance().NextTurn();
+        if (GameManager.GetInstance().turnCount == 54)
+        {
+            GameManager.GetInstance().GameOver();
+            gameUI.OnGameOver();
+        }
+        else
+        {
+            GameManager.GetInstance().NextTurn();
+        }
     }
 
     int searchAndMatch(int[] tempList, Dictionary<int, int[]> map)
