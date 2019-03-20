@@ -10,38 +10,39 @@ public class Tile : MonoBehaviour
     private Transform myParent;
     private SpriteRenderer tile;
     private int topVal, midVal, botVal;
-    private GridManager gridManager;
 
+    public int tileType;
     public bool movable;
     public Sprite[] renders;
     public SpriteRenderer top;
     public SpriteRenderer mid;
     public SpriteRenderer bot;
 
-    public enum TAG
-    {
-        player1,
-        player2
-    }
-    public TAG tag;
-
     void Start()
     {
-        gridManager = GameObject.Find("Player1").GetComponent<GridManager>();
         movable = true;
         tile = GetComponent<SpriteRenderer>();
         topVal = UnityEngine.Random.Range(7, 10);
-        // topVal = 9;
         top.sprite = renders[topVal - 7];
         midVal = UnityEngine.Random.Range(7, 10);
-        // midVal = 9;
         mid.sprite = renders[midVal - 7];
         botVal = UnityEngine.Random.Range(7, 10);
-        // botVal = 9;
         bot.sprite = renders[botVal - 7];
         startingPosition = transform.position;
         touchingTiles = new List<Transform>();
         myParent = transform.parent;
+    }
+
+    void Update()
+    {
+        if (GameManager.GetInstance().turn != tileType && movable)
+        {
+            tile.color = Color.gray;
+        }
+        else
+        {
+            tile.color = tileType == 0 ? Color.green : Color.blue;
+        }
     }
 
     public void PickUp()
@@ -136,9 +137,10 @@ public class Tile : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         transform.position = endingPos;
+        GridManager gridManager = transform.parent.parent.parent.GetComponent<GridManager>();
         int[] cell = gridManager.PosToGrid(endingPos);
         // Debug.Log("Place on x= " + cell[0] + ", y= " + cell[1]);
-        gridManager.UpdateGridVal(cell[0], cell[1], topVal, midVal, botVal);
         GameManager.GetInstance().SpawnNewTile();
+        gridManager.UpdateGridVal(cell[0], cell[1], topVal, midVal, botVal);
     }
 }

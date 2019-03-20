@@ -17,20 +17,20 @@ public class UIManager : MonoBehaviour
         gameManager = GameManager.GetInstance();
         currentPlayer1Score = gameManager.player1Score;
         currentPlayer2Score = gameManager.player2Score;
-        player1Score.text = "Player1: " + currentPlayer1Score;
-        player2Score.text = "Player2: " + currentPlayer2Score;
+        player1Score.text = "PLAYER 1: " + currentPlayer1Score;
+        player2Score.text = "PLAYER 2: " + currentPlayer2Score;
     }
     void Update()
     {
         if (gameManager.player1Score != currentPlayer1Score)
         {
             currentPlayer1Score = gameManager.player1Score;
-            player1Score.text = "Player1: " + currentPlayer1Score;
+            player1Score.text = "PLAYER 1: " + currentPlayer1Score;
         }
-        if (gameManager.player2Score != currentPlayer1Score)
+        if (gameManager.player2Score != currentPlayer2Score)
         {
-            currentPlayer1Score = gameManager.player2Score;
-            player2Score.text = "Player1: " + currentPlayer1Score;
+            currentPlayer2Score = gameManager.player2Score;
+            player2Score.text = "PLAYER 2: " + currentPlayer2Score;
         }
     }
 }

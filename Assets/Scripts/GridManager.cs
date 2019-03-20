@@ -101,8 +101,8 @@ public class GridManager : MonoBehaviour
             for (int j = 0; j <= k; j++)
             {
                 int i = k - j;
-                tempList[j] = grid[dim - i - 1, dim - j - 1];
-                map[j] = new int[] { dim - i - 1, dim - j - 1 };
+                tempList[j] = grid[dim - j - 1, i];
+                map[j] = new int[] { dim - j - 1, i };
             }
             newScore += searchAndMatch(tempList, map);
         }
@@ -123,6 +123,7 @@ public class GridManager : MonoBehaviour
 
         totalScore = newScore;
         UpdateScore();
+        GameManager.GetInstance().NextTurn();
     }
 
     int searchAndMatch(int[] tempList, Dictionary<int, int[]> map)

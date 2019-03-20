@@ -10,7 +10,7 @@ public class GameManager : Singleton<GameManager>
     public Transform spawnPosition2;
     public int player1Score;
     public int player2Score;
-    public int turn = 1;
+    public int turn = 0;
 
     void Start()
     {
