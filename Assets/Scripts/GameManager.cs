@@ -3,7 +3,7 @@ using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
 
-public class GameManager : Singleton<GameManager>
+public class GameManager : Singleton<GameManager>, IListener
 {
     public GameObject tile1;
     public GameObject tile2;
@@ -11,6 +11,7 @@ public class GameManager : Singleton<GameManager>
     public Transform spawnPosition2;
     public int player1Score;
     public int player2Score;
+
     // public int Turn
     // {
     //     get
@@ -31,6 +32,8 @@ public class GameManager : Singleton<GameManager>
     {
         Instantiate(tile1, spawnPosition1.position, Quaternion.identity, spawnPosition1);
         Instantiate(tile2, spawnPosition2.position, Quaternion.identity, spawnPosition2);
+        EventManager.GetInstance().AddListener(EVENT_TYPE.SCORE_CHANGE, this);
+        EventManager.GetInstance().AddListener(EVENT_TYPE.GAMEOVER, this);
     }
 
     public int NextTurn()
@@ -63,5 +66,21 @@ public class GameManager : Singleton<GameManager>
         turnCount = 0;
         isGameOver = false;
         SceneManager.LoadScene("Game");
+    }
+
+    public void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
+    {
+        switch (eventType)
+        {
+            case EVENT_TYPE.SCORE_CHANGE:
+                if (sender.tag == Constants.GRID1_TAG) player1Score = (int)param;
+                if (sender.tag == Constants.GRID2_TAG) player2Score = (int)param;
+                break;
+            case EVENT_TYPE.GAMEOVER:
+                GameOver();
+                break;
+            default:
+                break;
+        }
     }
 }

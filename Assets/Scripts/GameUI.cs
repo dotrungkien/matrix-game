@@ -19,8 +19,7 @@ public class GameUI : MonoBehaviour, IListener
         gameManager = GameManager.GetInstance();
         player1Score.text = "PLAYER 1: " + gameManager.player1Score;
         player2Score.text = "PLAYER 2: " + gameManager.player2Score;
-        EventManager.GetInstance().AddListener(EVENT_TYPE.PLAYER1_SCORE_CHANGE, this);
-        EventManager.GetInstance().AddListener(EVENT_TYPE.PLAYER2_SCORE_CHANGE, this);
+        EventManager.GetInstance().AddListener(EVENT_TYPE.SCORE_CHANGE, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.GAMEOVER, this);
     }
 
@@ -28,11 +27,9 @@ public class GameUI : MonoBehaviour, IListener
     {
         switch (eventType)
         {
-            case EVENT_TYPE.PLAYER1_SCORE_CHANGE:
-                player1Score.text = "PLAYER 1: " + gameManager.player1Score;
-                break;
-            case EVENT_TYPE.PLAYER2_SCORE_CHANGE:
-                player2Score.text = "PLAYER 2: " + gameManager.player2Score;
+            case EVENT_TYPE.SCORE_CHANGE:
+                if (sender.tag == Constants.GRID1_TAG) player1Score.text = string.Format("PLAYER 1: {0}", (int)param);
+                if (sender.tag == Constants.GRID2_TAG) player2Score.text = string.Format("PLAYER 2: {0}", (int)param);
                 break;
             case EVENT_TYPE.GAMEOVER:
                 if (gameManager.player1Score == gameManager.player2Score)

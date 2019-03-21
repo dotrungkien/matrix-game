@@ -6,8 +6,7 @@ public enum EVENT_TYPE
 {
     GAMEOVER,
     NEXT_PLAYER,
-    PLAYER1_SCORE_CHANGE,
-    PLAYER2_SCORE_CHANGE,
+    SCORE_CHANGE,
 }
 
 public interface IListener

@@ -4,11 +4,9 @@ using UnityEngine;
 
 public class GridManager : MonoBehaviour
 {
-    public string playerTag;
     public float cellSize = 0.5f;
     int[,] grid = new int[9, 9];
-    public int totalScore = 0;
-    public GameUI gameUI;
+    public int score = 0;
 
     public int[] PosToGrid(Vector2 pos)
     {
@@ -33,7 +31,6 @@ public class GridManager : MonoBehaviour
         grid[x, y - 1] = bot;
         grid[x, y + 1] = top;
         UpdateStatus();
-        // GridLog();
     }
 
     public void UpdateStatus()
@@ -122,13 +119,12 @@ public class GridManager : MonoBehaviour
             newScore += searchAndMatch(tempList, map);
         }
 
-        totalScore = newScore;
+        score = newScore;
         UpdateScore();
         if (GameManager.GetInstance().turnCount == 54)
         {
             GameManager.GetInstance().GameOver();
             EventManager.GetInstance().PostNotification(EVENT_TYPE.GAMEOVER);
-            // gameUI.OnGameOver();
         }
         else
         {
@@ -167,17 +163,7 @@ public class GridManager : MonoBehaviour
 
     public void UpdateScore()
     {
-        if (playerTag == "Player1")
-        {
-            GameManager.GetInstance().player1Score = totalScore;
-            EventManager.GetInstance().PostNotification(EVENT_TYPE.PLAYER1_SCORE_CHANGE);
-        }
-        if (playerTag == "Player2")
-        {
-            GameManager.GetInstance().player2Score = totalScore;
-            EventManager.GetInstance().PostNotification(EVENT_TYPE.PLAYER2_SCORE_CHANGE);
-        }
-
+        EventManager.GetInstance().PostNotification(EVENT_TYPE.SCORE_CHANGE, this, score);
     }
 
     void DrawLine(Vector3 from, Vector3 to)
@@ -188,25 +174,13 @@ public class GridManager : MonoBehaviour
         lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
         lineRenderer.startColor = Color.black;
         lineRenderer.endColor = Color.black;
-        lineRenderer.startWidth = 0.04f;
-        lineRenderer.endWidth = 0.04f;
+        lineRenderer.startWidth = 0.03f;
+        lineRenderer.endWidth = 0.03f;
         lineRenderer.positionCount = 2;
         lineRenderer.useWorldSpace = true;
         lineRenderer.SetPosition(0, from);
         lineRenderer.SetPosition(1, to);
         lineRenderer.sortingLayerName = "Tile";
         lineRenderer.sortingOrder = 5;
-    }
-
-    private void GridLog()
-    {
-        for (int i = 0; i < 9; i++)
-        {
-            for (int j = 0; j < 9; j++)
-            {
-                Debug.Log("i = " + i + " j = " + j + " grid[i,j] = " + grid[i, j] + " ");
-            }
-            Debug.Log("\n");
-        }
     }
 }

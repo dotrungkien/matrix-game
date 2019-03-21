@@ -25,9 +25,7 @@ public class Connection : MonoBehaviour
 
         socket.Connect("wss://matrix.heasygame.com/socket", socketArgument);
 
-
-
-        var roomChannel = socket.MakeChannel("room:lobby");
+        var roomChannel = socket.MakeChannel("lobby");
         roomChannel.On(Message.InBoundEvent.phx_error, mes =>
         {
             Debug.Log(string.Format("loi cmnr"));
