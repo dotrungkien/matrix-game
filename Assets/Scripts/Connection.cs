@@ -15,7 +15,15 @@ public class Connection : MonoBehaviour
 
         Dictionary<string, string> socketArgument = new Dictionary<string, string>();
         socketArgument["id"] = "HU6OY-oh";
+        socketArgument["vsn"] = "2.0.0";
 
         socket.Connect("wss://matrix.heasygame.com/socket/websocket", socketArgument);
+        var roomChannel = socket.MakeChannel("lobby");
+        roomChannel.On(Message.InBoundEvent.phx_close, m => Debug.Log(m));
+        roomChannel.On("after_join", m => Debug.Log(m));
+
+        roomChannel.Join(null)
+        .Receive(Reply.Status.Ok, r => Debug.Log(r))
+        .Receive(Reply.Status.Error, r => Debug.Log(r));
     }
 }
