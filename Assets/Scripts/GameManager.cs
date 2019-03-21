@@ -11,15 +11,28 @@ public class GameManager : Singleton<GameManager>
     public Transform spawnPosition2;
     public int player1Score;
     public int player2Score;
-    public int turn = 0;
+    // public int Turn
+    // {
+    //     get
+    //     {
+    //         return turn;
+    //     }
+    //     set
+    //     {
+    //         turn = turn == 0 ? 1 : 0;
+    //         EventManager.GetInstance().PostNotification(EVENT_TYPE.NEXT_PLAYER, null, turn);
+    //     }
+    // }
     public int turnCount = 0;
     public bool isGameOver = false;
 
+    public int turn;
     void Start()
     {
         Instantiate(tile1, spawnPosition1.position, Quaternion.identity, spawnPosition1);
         Instantiate(tile2, spawnPosition2.position, Quaternion.identity, spawnPosition2);
     }
+
     public int NextTurn()
     {
         turn = turn == 0 ? 1 : 0;

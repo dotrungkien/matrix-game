@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-
-public class GameUI : MonoBehaviour
+public class GameUI : MonoBehaviour, IListener
 {
     public Text player1Score;
     public Text player2Score;
@@ -12,51 +11,50 @@ public class GameUI : MonoBehaviour
     public Text player1Result;
     public Text player2Result;
 
-    private int currentPlayer1Score;
-    private int currentPlayer2Score;
     GameManager gameManager;
 
     void Start()
     {
         gameOverPanel.SetActive(false);
         gameManager = GameManager.GetInstance();
-        currentPlayer1Score = gameManager.player1Score;
-        currentPlayer2Score = gameManager.player2Score;
-        player1Score.text = "PLAYER 1: " + currentPlayer1Score;
-        player2Score.text = "PLAYER 2: " + currentPlayer2Score;
-    }
-    void Update()
-    {
-        if (gameManager.player1Score != currentPlayer1Score)
-        {
-            currentPlayer1Score = gameManager.player1Score;
-            player1Score.text = "PLAYER 1: " + currentPlayer1Score;
-        }
-        if (gameManager.player2Score != currentPlayer2Score)
-        {
-            currentPlayer2Score = gameManager.player2Score;
-            player2Score.text = "PLAYER 2: " + currentPlayer2Score;
-        }
+        player1Score.text = "PLAYER 1: " + gameManager.player1Score;
+        player2Score.text = "PLAYER 2: " + gameManager.player2Score;
+        EventManager.GetInstance().AddListener(EVENT_TYPE.PLAYER1_SCORE_CHANGE, this);
+        EventManager.GetInstance().AddListener(EVENT_TYPE.PLAYER2_SCORE_CHANGE, this);
+        EventManager.GetInstance().AddListener(EVENT_TYPE.GAMEOVER, this);
     }
 
-    public void OnGameOver()
+    public void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
     {
-        if (gameManager.player1Score == gameManager.player2Score)
+        switch (eventType)
         {
-            player1Result.text = "DRAW";
-            player2Result.text = "DRAW";
-        }
-        else if (gameManager.player1Score > gameManager.player2Score)
-        {
-            player1Result.text = "WIN";
-            player2Result.text = "LOSE";
-        }
-        else
-        {
-            player1Result.text = "LOSE";
-            player2Result.text = "WIN";
-        }
+            case EVENT_TYPE.PLAYER1_SCORE_CHANGE:
+                player1Score.text = "PLAYER 1: " + gameManager.player1Score;
+                break;
+            case EVENT_TYPE.PLAYER2_SCORE_CHANGE:
+                player2Score.text = "PLAYER 2: " + gameManager.player2Score;
+                break;
+            case EVENT_TYPE.GAMEOVER:
+                if (gameManager.player1Score == gameManager.player2Score)
+                {
+                    player1Result.text = "DRAW";
+                    player2Result.text = "DRAW";
+                }
+                else if (gameManager.player1Score > gameManager.player2Score)
+                {
+                    player1Result.text = "WIN";
+                    player2Result.text = "LOSE";
+                }
+                else
+                {
+                    player1Result.text = "LOSE";
+                    player2Result.text = "WIN";
+                }
 
-        gameOverPanel.SetActive(true);
+                gameOverPanel.SetActive(true);
+                break;
+            default:
+                break;
+        }
     }
 }

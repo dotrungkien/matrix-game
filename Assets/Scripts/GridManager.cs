@@ -127,7 +127,8 @@ public class GridManager : MonoBehaviour
         if (GameManager.GetInstance().turnCount == 54)
         {
             GameManager.GetInstance().GameOver();
-            gameUI.OnGameOver();
+            EventManager.GetInstance().PostNotification(EVENT_TYPE.GAMEOVER);
+            // gameUI.OnGameOver();
         }
         else
         {
@@ -169,10 +170,12 @@ public class GridManager : MonoBehaviour
         if (playerTag == "Player1")
         {
             GameManager.GetInstance().player1Score = totalScore;
+            EventManager.GetInstance().PostNotification(EVENT_TYPE.PLAYER1_SCORE_CHANGE);
         }
         if (playerTag == "Player2")
         {
             GameManager.GetInstance().player2Score = totalScore;
+            EventManager.GetInstance().PostNotification(EVENT_TYPE.PLAYER2_SCORE_CHANGE);
         }
 
     }
