@@ -12,18 +12,6 @@ public class GameManager : Singleton<GameManager>, IListener
     public int player1Score;
     public int player2Score;
 
-    // public int Turn
-    // {
-    //     get
-    //     {
-    //         return turn;
-    //     }
-    //     set
-    //     {
-    //         turn = turn == 0 ? 1 : 0;
-    //         EventManager.GetInstance().PostNotification(EVENT_TYPE.NEXT_PLAYER, null, turn);
-    //     }
-    // }
     public int turnCount = 0;
     public bool isGameOver = false;
 
