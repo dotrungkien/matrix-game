@@ -8,32 +8,32 @@ public class EventManager : Singleton<EventManager>
 {
     private Dictionary<EVENT_TYPE, List<IListener>> listeners = new Dictionary<EVENT_TYPE, List<IListener>>();
 
-    public void AddListener(EVENT_TYPE eventType, IListener Listener)
+    public void AddListener(EVENT_TYPE eventType, IListener listener)
     {
-        List<IListener> ListenList = null;
+        List<IListener> listenerList = null;
 
-        if (listeners.TryGetValue(eventType, out ListenList))
+        if (listeners.TryGetValue(eventType, out listenerList))
         {
-            ListenList.Add(Listener);
+            listenerList.Add(listener);
             return;
         }
 
-        ListenList = new List<IListener>();
-        ListenList.Add(Listener);
-        listeners.Add(eventType, ListenList);
+        listenerList = new List<IListener>();
+        listenerList.Add(listener);
+        listeners.Add(eventType, listenerList);
     }
 
     public void PostNotification(EVENT_TYPE eventType, Component sender = null, object param = null)
     {
-        List<IListener> ListenList = null;
+        List<IListener> listenerList = null;
 
-        if (!listeners.TryGetValue(eventType, out ListenList))
+        if (!listeners.TryGetValue(eventType, out listenerList))
             return;
 
-        for (int i = 0; i < ListenList.Count; i++)
+        for (int i = 0; i < listenerList.Count; i++)
         {
-            if (!ListenList[i].Equals(null)) //If object is not null, then send message via interfaces
-                ListenList[i].OnEvent(eventType, sender, param);
+            if (!listenerList[i].Equals(null)) //If object is not null, then send message via interfaces
+                listenerList[i].OnEvent(eventType, sender, param);
         }
     }
     public void RemoveEvent(EVENT_TYPE eventType)
@@ -43,7 +43,7 @@ public class EventManager : Singleton<EventManager>
 
     public void RemoveRedundancies()
     {
-        Dictionary<EVENT_TYPE, List<IListener>> TmpListeners = new Dictionary<EVENT_TYPE, List<IListener>>();
+        Dictionary<EVENT_TYPE, List<IListener>> tmpListeners = new Dictionary<EVENT_TYPE, List<IListener>>();
 
         foreach (KeyValuePair<EVENT_TYPE, List<IListener>> Item in listeners)
         {
@@ -54,10 +54,10 @@ public class EventManager : Singleton<EventManager>
             }
 
             if (Item.Value.Count > 0)
-                TmpListeners.Add(Item.Key, Item.Value);
+                tmpListeners.Add(Item.Key, Item.Value);
         }
 
-        listeners = TmpListeners;
+        listeners = tmpListeners;
     }
 
     void OnEnable()
