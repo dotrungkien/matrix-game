@@ -25,13 +25,16 @@ public class Connection : Singleton<Connection>
             PlayerPrefs.SetString("userID", userID);
         }
         SocketConnect();
-        JoinLobby();
     }
 
     void SocketConnect()
     {
-        socket = new Socket(new WebsocketSharpFactory());
-        Socket.OnOpenDelegate onOpenCallback = () => Debug.Log("Socket on open.");
+        socket = new Socket(new BestHTTPWebsocketFactory());
+        Socket.OnOpenDelegate onOpenCallback = () =>
+        {
+            Debug.Log("Socket on open.");
+            JoinLobby();
+        };
         Socket.OnClosedDelegate onCloseCallback = (code, message) => Debug.Log(string.Format("Socket on close. {0} {1}", code, message));
         // Socket.OnMessageDelegate onMessageCallback = (message) => Debug.Log(string.Format("Socket on message. {0}", message));
         Socket.OnErrorDelegate onErrorCallback = message => Debug.Log("Socket on error.");
@@ -78,8 +81,8 @@ public class Connection : Singleton<Connection>
             gameID = reply.response.GetValue("game_id").ToString();
             currentGames.Add(gameID);
             JoinGame(gameID);
-            Debug.Log(string.Format("Create new game ok. {0}, current games: {1}", gameID, currentGames.Count));
             EventManager.GetInstance().PostNotification(EVENT_TYPE.CREATE_GAME);
+            JoinGame(gameID, "");
         })
         .Receive(Reply.Status.Error, reply => Debug.Log("Create new game failed."));
     }
@@ -110,6 +113,8 @@ public class Connection : Singleton<Connection>
         {
             Debug.Log(MessageSerialization.Serialize(data));
             var piece = data.payload["piece"];
+            int[] pieceVal = piece.ToObject<int[]>();
+            EventManager.GetInstance().PostNotification(EVENT_TYPE.NEW_PIECE, this, pieceVal);
         });
         gameChannel.On("game:player_joined", data =>
         {

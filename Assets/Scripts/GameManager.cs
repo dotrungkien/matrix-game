@@ -18,10 +18,11 @@ public class GameManager : Singleton<GameManager>, IListener
     public int turn;
     void Start()
     {
-        Instantiate(tile1, spawnPosition1.position, Quaternion.identity, spawnPosition1);
-        Instantiate(tile2, spawnPosition2.position, Quaternion.identity, spawnPosition2);
+        // Instantiate(tile1, spawnPosition1.position, Quaternion.identity, spawnPosition1);
+        // Instantiate(tile2, spawnPosition2.position, Quaternion.identity, spawnPosition2);
         EventManager.GetInstance().AddListener(EVENT_TYPE.SCORE_CHANGE, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.GAMEOVER, this);
+        EventManager.GetInstance().AddListener(EVENT_TYPE.NEW_PIECE, this);
     }
 
     public int NextTurn()
@@ -30,17 +31,21 @@ public class GameManager : Singleton<GameManager>, IListener
         return turn;
     }
 
-    public void SpawnNewTile()
+    public void SpawnNewTile(int[] piece)
     {
         turnCount += 1;
+        GameObject tileObj;
         if (turn == 0)
         {
-            Instantiate(tile1, spawnPosition1.position, Quaternion.identity, spawnPosition1);
+            tileObj = Instantiate(tile1, spawnPosition1.position, Quaternion.identity, spawnPosition1);
+
         }
-        if (turn == 1)
+        else
         {
-            Instantiate(tile2, spawnPosition2.position, Quaternion.identity, spawnPosition2);
+            tileObj = Instantiate(tile2, spawnPosition2.position, Quaternion.identity, spawnPosition2);
         }
+        Tile tile = tileObj.GetComponent<Tile>();
+        tile.SetVal(piece);
     }
 
     public void GameOver()
@@ -66,6 +71,11 @@ public class GameManager : Singleton<GameManager>, IListener
                 break;
             case EVENT_TYPE.GAMEOVER:
                 GameOver();
+                break;
+            case EVENT_TYPE.NEW_PIECE:
+                int[] pieceVal = (int[])param;
+                Debug.Log(string.Format("New Piece {0} {1} {2}", pieceVal[0], pieceVal[1], pieceVal[2]));
+                SpawnNewTile(pieceVal);
                 break;
             default:
                 break;

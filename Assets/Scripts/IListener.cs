@@ -6,6 +6,7 @@ public enum EVENT_TYPE
 {
     GAMEOVER,
     NEXT_PLAYER,
+    NEW_PIECE,
     SCORE_CHANGE,
     CREATE_GAME,
     JOIN_GAME,

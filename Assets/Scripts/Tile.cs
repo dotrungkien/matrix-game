@@ -22,15 +22,19 @@ public class Tile : MonoBehaviour
     {
         movable = true;
         tile = GetComponent<SpriteRenderer>();
-        topVal = UnityEngine.Random.Range(7, 10);
-        top.sprite = renders[topVal - 7];
-        midVal = UnityEngine.Random.Range(7, 10);
-        mid.sprite = renders[midVal - 7];
-        botVal = UnityEngine.Random.Range(7, 10);
-        bot.sprite = renders[botVal - 7];
         startingPosition = transform.position;
         touchingTiles = new List<Transform>();
         myParent = transform.parent;
+    }
+
+    public void SetVal(int[] val)
+    {
+        topVal = val[0];
+        top.sprite = renders[topVal - 7];
+        midVal = val[1];
+        mid.sprite = renders[midVal - 7];
+        botVal = val[2];
+        bot.sprite = renders[botVal - 7];
     }
 
     void Update()
@@ -140,7 +144,7 @@ public class Tile : MonoBehaviour
         GridManager gridManager = transform.parent.parent.parent.GetComponent<GridManager>();
         int[] cell = gridManager.PosToGrid(endingPos);
         // Debug.Log("Place on x= " + cell[0] + ", y= " + cell[1]);
-        GameManager.GetInstance().SpawnNewTile();
+        // GameManager.GetInstance().SpawnNewTile();
         gridManager.UpdateGridVal(cell[0], cell[1], topVal, midVal, botVal);
     }
 }
