@@ -25,6 +25,7 @@ public class EventManager : Singleton<EventManager>
 
     public void PostNotification(EVENT_TYPE eventType, Component sender = null, object param = null)
     {
+        // Debug.Log(string.Format("===============OnEvent: {0}===============", eventType));
         List<IListener> listenerList = null;
 
         if (!listeners.TryGetValue(eventType, out listenerList))

@@ -2,10 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Phoenix;
+using Newtonsoft.Json.Linq;
 
-public class Connection : Singleton<Connection>, IListener
+public class Connection : Singleton<Connection>
 {
     [HideInInspector]
     public string userID;
@@ -16,22 +16,16 @@ public class Connection : Singleton<Connection>, IListener
     private Channel lobbyChannel;
     private Channel gameChannel;
 
-    void Awake()
+    void Start()
     {
-        Debug.Log("this is awake");
         userID = PlayerPrefs.GetString("userID", "");
         if (userID == "")
         {
-            Debug.Log("User ID not found. Create a new one.");
             userID = System.Guid.NewGuid().ToString();
             PlayerPrefs.SetString("userID", userID);
         }
-        Debug.Log(string.Format("User ID: {0}", userID));
         SocketConnect();
         JoinLobby();
-        // SceneManager.LoadScene("Game");
-        // CreateNewGame(JoinGame);
-        // JoinGame("parrot-wench-7508");
     }
 
     void SocketConnect()
@@ -40,7 +34,7 @@ public class Connection : Singleton<Connection>, IListener
         Socket.OnOpenDelegate onOpenCallback = () => Debug.Log("Socket on open.");
         Socket.OnClosedDelegate onCloseCallback = (code, message) => Debug.Log(string.Format("Socket on close. {0} {1}", code, message));
         // Socket.OnMessageDelegate onMessageCallback = (message) => Debug.Log(string.Format("Socket on message. {0}", message));
-        Socket.OnErrorDelegate onErrorCallback = (message) => Debug.Log("Socket on error.");
+        Socket.OnErrorDelegate onErrorCallback = message => Debug.Log("Socket on error.");
 
         socket.OnOpen += onOpenCallback;
         socket.OnError += onErrorCallback;
@@ -56,6 +50,10 @@ public class Connection : Singleton<Connection>, IListener
     void JoinLobby()
     {
         lobbyChannel = socket.MakeChannel("lobby");
+        lobbyChannel.On("current_games", data =>
+        {
+            Debug.Log(MessageSerialization.Serialize(data));
+        });
         var param = new Dictionary<string, object> { };
         lobbyChannel.Join(param)
             .Receive(Reply.Status.Ok, reply => Debug.Log("Join lobbyChannel ok."))
@@ -63,8 +61,9 @@ public class Connection : Singleton<Connection>, IListener
             .Receive(Reply.Status.Timeout, reply => Debug.Log("Time out"));
     }
 
-    public void CreateNewGame(Action<string, string> joinCallback = null)
+    public void CreateNewGame()
     {
+        string gameID = "";
         var newGame = new Dictionary<string, object>
         {
             {"max_player", "2"},
@@ -76,21 +75,22 @@ public class Connection : Singleton<Connection>, IListener
         lobbyChannel.Push("new_game", newGame)
         .Receive(Reply.Status.Ok, reply =>
         {
-            string gameID = reply.response.GetValue("game_id").ToString();
+            gameID = reply.response.GetValue("game_id").ToString();
             currentGames.Add(gameID);
-            Debug.Log(string.Format("Create new game ok. {0}", gameID));
-            SceneManager.LoadScene("Game");
-            // if (joinCallback != null) joinCallback(gameID, "");
+            JoinGame(gameID);
+            Debug.Log(string.Format("Create new game ok. {0}, current games: {1}", gameID, currentGames.Count));
+            EventManager.GetInstance().PostNotification(EVENT_TYPE.CREATE_GAME);
         })
         .Receive(Reply.Status.Error, reply => Debug.Log("Create new game failed."));
     }
 
     public void JoinGame(string gameID, string password = "")
     {
-        gameChannel = socket.MakeChannel(string.Format("game:{0}", gameID));
+        GameChannelSetup(gameID);
+        var username = PlayerPrefs.GetString("username", "noname");
         var param = new Dictionary<string, object>
         {
-            {"nick", userID},
+            {"nick", username},
             {"password", password}
         };
         gameChannel.Join(param)
@@ -101,9 +101,42 @@ public class Connection : Singleton<Connection>, IListener
             })
             .Receive(Reply.Status.Error, reply => Debug.Log(string.Format("Join game {0} failed.", gameID)))
             .Receive(Reply.Status.Timeout, reply => Debug.Log("Time out"));
-        StartListen();
-        SceneManager.LoadScene("Game");
+    }
 
+    public void GameChannelSetup(string gameID)
+    {
+        gameChannel = socket.MakeChannel(string.Format("game:{0}", gameID));
+        gameChannel.On("game:new_piece", data =>
+        {
+            Debug.Log(MessageSerialization.Serialize(data));
+            var piece = data.payload["piece"];
+        });
+        gameChannel.On("game:player_joined", data =>
+        {
+            Debug.Log(MessageSerialization.Serialize(data));
+        });
+        gameChannel.On("game:started", data =>
+        {
+            Debug.Log(MessageSerialization.Serialize(data));
+        });
+        gameChannel.On("game:stopped", data =>
+        {
+            Debug.Log(MessageSerialization.Serialize(data));
+        });
+        gameChannel.On("game:player_left", data =>
+        {
+            Debug.Log(MessageSerialization.Serialize(data));
+
+        });
+        gameChannel.On("game:over", data =>
+        {
+            Debug.Log(MessageSerialization.Serialize(data));
+
+        });
+        gameChannel.On("game:place_piece", data =>
+        {
+            Debug.Log(MessageSerialization.Serialize(data));
+        });
     }
 
     public void SetReady()
@@ -115,66 +148,13 @@ public class Connection : Singleton<Connection>, IListener
         gameChannel.Push("game:set_ready", param)
         .Receive(Reply.Status.Ok, reply =>
             {
-                Debug.Log(string.Format("Ready for game."));
+                Debug.Log("Ready for game.");
             })
             .Receive(Reply.Status.Error, reply => Debug.Log("Not yet ready."));
-    }
-
-    void StartListen()
-    {
-        Debug.Log("Start Listen >>>>>>>>>>>>>>");
-        gameChannel.On("game:new_piece", payload =>
-        {
-            Debug.Log("-----------------------new piece-----------------------");
-            Debug.Log(payload);
-        });
-        gameChannel.On("game:player_joined", payload =>
-        {
-            Debug.Log("-----------------------player join-----------------------");
-        });
-        gameChannel.On("game:started", payload =>
-        {
-            Debug.Log("-----------------------Game started-----------------------");
-            Debug.Log(payload);
-        });
-        gameChannel.On("game:stopped", payload =>
-        {
-            Debug.Log("-----------------------Game stopped-----------------------");
-        });
-        gameChannel.On("game:player_left", payload =>
-        {
-            Debug.Log("-----------------------player left-----------------------");
-
-        });
-        gameChannel.On("game:over", payload =>
-        {
-            Debug.Log("-----------------------game over-----------------------");
-
-        });
-        gameChannel.On("game:place_piece", payload =>
-        {
-            Debug.Log("-----------------------place piece-----------------------");
-            Debug.Log(payload);
-        });
     }
 
     void OnApplicationQuit()
     {
         PlayerPrefs.DeleteKey("userID");
-    }
-
-    public void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
-    {
-        switch (eventType)
-        {
-            case EVENT_TYPE.CREATE_GAME:
-                SceneManager.LoadScene("Game");
-                break;
-            case EVENT_TYPE.JOIN_GAME:
-                SceneManager.LoadScene("Game");
-                break;
-            default:
-                break;
-        }
     }
 }

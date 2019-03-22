@@ -5,22 +5,66 @@ using UnityEngine.UI;
 
 public class GameUI : MonoBehaviour, IListener
 {
+    public string gameID;
+
+    // lobby panel
+    public GameObject lobbyPanel;
+    public InputField usernameInput;
+    public Button setUsername;
+    public Button createGameButton;
+    public Button joinGameButton;
+    //game panel
+    public GameObject gamePanel;
     public Text player1Score;
     public Text player2Score;
     public GameObject gameOverPanel;
     public Text player1Result;
     public Text player2Result;
+    public Button readyButton;
 
     GameManager gameManager;
 
     void Start()
     {
+        lobbyPanel.SetActive(true);
+        createGameButton.onClick.AddListener(CreateGame);
+        joinGameButton.onClick.AddListener(JoinGame);
+        setUsername.onClick.AddListener(SetName);
+        usernameInput.text = PlayerPrefs.GetString("username", "");
+
+        gamePanel.SetActive(false);
         gameOverPanel.SetActive(false);
         gameManager = GameManager.GetInstance();
         player1Score.text = "PLAYER 1: " + gameManager.player1Score;
         player2Score.text = "PLAYER 2: " + gameManager.player2Score;
         EventManager.GetInstance().AddListener(EVENT_TYPE.SCORE_CHANGE, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.GAMEOVER, this);
+        readyButton.onClick.AddListener(Ready);
+    }
+
+    public void CreateGame()
+    {
+        Connection.GetInstance().CreateNewGame();
+        lobbyPanel.SetActive(false);
+        gamePanel.SetActive(true);
+    }
+
+    public void JoinGame()
+    {
+        Connection.GetInstance().JoinGame(gameID, "");
+        lobbyPanel.SetActive(false);
+        gamePanel.SetActive(true);
+    }
+
+    public void Ready()
+    {
+        readyButton.gameObject.SetActive(false);
+        Connection.GetInstance().SetReady();
+    }
+
+    void SetName()
+    {
+        PlayerPrefs.SetString("username", usernameInput.text);
     }
 
     public void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
