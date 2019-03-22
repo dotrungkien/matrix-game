@@ -2,6 +2,7 @@
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 public class GameManager : Singleton<GameManager>, IListener
 {
@@ -16,6 +17,9 @@ public class GameManager : Singleton<GameManager>, IListener
     public bool isGameOver = false;
 
     public int turn;
+
+    private Dictionary<string, GridManager> grids = new Dictionary<string, GridManager>();
+
     void Start()
     {
         // Instantiate(tile1, spawnPosition1.position, Quaternion.identity, spawnPosition1);
@@ -74,7 +78,7 @@ public class GameManager : Singleton<GameManager>, IListener
                 break;
             case EVENT_TYPE.NEW_PIECE:
                 int[] pieceVal = (int[])param;
-                Debug.Log(string.Format("New Piece {0} {1} {2}", pieceVal[0], pieceVal[1], pieceVal[2]));
+                // Debug.Log(string.Format("New Piece {0} {1} {2}", pieceVal[0], pieceVal[1], pieceVal[2]));
                 SpawnNewTile(pieceVal);
                 break;
             default:

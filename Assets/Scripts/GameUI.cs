@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class GameUI : MonoBehaviour, IListener
 {
     public string gameID;
+    public Connection connection;
 
     // lobby panel
     public GameObject lobbyPanel;
@@ -44,14 +45,14 @@ public class GameUI : MonoBehaviour, IListener
 
     public void CreateGame()
     {
-        Connection.GetInstance().CreateNewGame();
+        connection.CreateNewGame();
         lobbyPanel.SetActive(false);
         gamePanel.SetActive(true);
     }
 
     public void JoinGame()
     {
-        Connection.GetInstance().JoinGame(gameID, "");
+        connection.JoinGame(gameID, "");
         lobbyPanel.SetActive(false);
         gamePanel.SetActive(true);
     }
@@ -59,7 +60,7 @@ public class GameUI : MonoBehaviour, IListener
     public void Ready()
     {
         readyButton.gameObject.SetActive(false);
-        Connection.GetInstance().SetReady();
+        connection.SetReady();
     }
 
     void SetName()

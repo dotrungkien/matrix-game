@@ -5,11 +5,11 @@ using UnityEngine;
 using Phoenix;
 using Newtonsoft.Json.Linq;
 
-public class Connection : Singleton<Connection>
+public class Connection : MonoBehaviour
 {
     [HideInInspector]
     public string userID;
-
+    public GridManager[] grids;
 
     List<string> currentGames = new List<string>();
     private Socket socket = null;
@@ -80,7 +80,6 @@ public class Connection : Singleton<Connection>
         {
             gameID = reply.response.GetValue("game_id").ToString();
             currentGames.Add(gameID);
-            JoinGame(gameID);
             EventManager.GetInstance().PostNotification(EVENT_TYPE.CREATE_GAME);
             JoinGame(gameID, "");
         })
@@ -140,7 +139,9 @@ public class Connection : Singleton<Connection>
         });
         gameChannel.On("game:place_piece", data =>
         {
+            // {"topic":"game:shipshape-foul-545","event":"game:place_piece","ref":null,"payload":{"player_id":"HU6OY-oh","piece":{"y":0,"x":8,"values":[7,9,7]},"game":{"turn":1,"time_limit":0,"spectators":[],"spectator_nicks":{},"points":{"HU6OY-oh":0,"2f250712-f039-4665-aac2-7149738da179":0},"players":["2f250712-f039-4665-aac2-7149738da179","HU6OY-oh"],"player_states":{"HU6OY-oh":"ready","2f250712-f039-4665-aac2-7149738da179":"moving"},"player_nicks":["Kien","sâfsafs"],"player_boards":{"HU6OY-oh":{"points":0,"player_id":"HU6OY-oh","nick":"sâfsafs","grid":{"86":-1,"70":-1,"53":-1,"33":-1,"60":-1,"47":-1,"08":7,"05":-1,"51":-1,"01":-1,"38":-1,"48":-1,"56":-1,"62":-1,"21":-1,"03":-1,"22":-1,"20":-1,"66":-1,"30":-1,"02":-1,"76":-1,"41":-1,"43":-1,"31":-1,"72":-1,"84":-1,"88":-1,"23":-1,"00":-1,"83":-1,"35":-1,"27":-1,"18":9,"80":-1,"67":-1,"54":-1,"28":7,"65":-1,"25":-1,"63":-1,"85":-1,"17":-1,"15":-1,"40":-1,"11":-1,"45":-1,"57":-1,"68":-1,"74":-1,"52":-1,"73":-1,"44":-1,"04":-1,"13":-1,"55":-1,"50":-1,"06":-1,"46":-1,"82":-1,"32":-1,"77":-1,"34":-1,"07":-1,"64":-1,"26":-1,"81":-1,"16":-1,"36":-1,"42":-1,"12":-1,"71":-1,"75":-1,"14":-1,"24":-1,"87":-1,"78":-1,"37":-1,"10":-1,"58":-1,"61":-1},"game_id":"shipshape-foul-545"},"2f250712-f039-4665-aac2-7149738da179":{"points":0,"player_id":"2f250712-f039-4665-aac2-7149738da179","nick":"Kien","grid":{"86":-1,"70":-1,"53":-1,"33":-1,"60":-1,"47":-1,"08":-1,"05":-1,"51":-1,"01":-1,"38":-1,"48":-1,"56":-1,"62":-1,"21":-1,"03":-1,"22":-1,"20":-1,"66":-1,"30":-1,"02":-1,"76":-1,"41":-1,"43":-1,"31":-1,"72":-1,"84":-1,"88":-1,"23":-1,"00":-1,"83":-1,"35":-1,"27":-1,"18":-1,"80":-1,"67":-1,"54":-1,"28":-1,"65":-1,"25":-1,"63":-1,"85":-1,"17":-1,"15":-1,"40":-1,"11":-1,"45":-1,"57":-1,"68":-1,"74":-1,"52":-1,"73":-1,"44":-1,"04":-1,"13":-1,"55":-1,"50":-1,"06":-1,"46":-1,"82":-1,"32":-1,"77":-1,"34":-1,"07":-1,"64":-1,"26":-1,"81":-1,"16":-1,"36":-1,"42":-1,"12":-1,"71":-1,"75":-1,"14":-1,"24":-1,"87":-1,"78":-1,"37":-1,"10":-1,"58":-1,"61":-1},"game_id":"shipshape-foul-545"}},"piece_values":[7,9,7],"phase":"running","mode":"easy","max_player":2,"locked":false,"id":"shipshape-foul-545"}}}
             Debug.Log(MessageSerialization.Serialize(data));
+            string sender = data.payload["player_id"].ToObject<string>();
         });
     }
 
