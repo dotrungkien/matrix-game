@@ -8,7 +8,13 @@ public class GridBase : MonoBehaviour
 
     public float cellSize = 0.5f;
     int[,] grid = new int[9, 9];
-    public int score = 0;
+
+    public int[] KeyToGrid(string key)
+    {
+        int x = (int)key[0];
+        int y = (int)key[1];
+        return new int[2] { x, y };
+    }
 
     public int[] PosToGrid(Vector2 pos)
     {
@@ -37,7 +43,6 @@ public class GridBase : MonoBehaviour
 
     public void UpdateStatus()
     {
-        int newScore = 0;
         int dim = 9;
 
         // Columns
@@ -48,9 +53,8 @@ public class GridBase : MonoBehaviour
             for (int j = 0; j < dim; j++)
             {
                 tempList[j] = grid[i, j];
-                map[j] = new int[] { i, j };
+                map[j] = new int[2] { i, j };
             }
-            newScore += searchAndMatch(tempList, map);
         }
         // Rows
         for (int j = 0; j < dim; j++)
@@ -60,9 +64,8 @@ public class GridBase : MonoBehaviour
             for (int i = 0; i < dim; i++)
             {
                 tempList[i] = grid[i, j];
-                map[i] = new int[] { i, j };
+                map[i] = new int[2] { i, j };
             }
-            newScore += searchAndMatch(tempList, map);
         }
         // lower \ diagonal
         for (int k = 2; k < dim; k++)
@@ -73,9 +76,8 @@ public class GridBase : MonoBehaviour
             {
                 int i = k - j;
                 tempList[j] = grid[i, j];
-                map[j] = new int[] { i, j };
+                map[j] = new int[2] { i, j };
             }
-            newScore += searchAndMatch(tempList, map);
         }
         // upper \ diagonal
         for (int k = dim - 2; k >= 2; k--)
@@ -87,11 +89,9 @@ public class GridBase : MonoBehaviour
             {
                 int i = k - j;
                 tempList[j] = grid[dim - j - 1, dim - i - 1];
-                map[j] = new int[] { dim - j - 1, dim - i - 1 };
+                map[j] = new int[2] { dim - j - 1, dim - i - 1 };
             }
-            newScore += searchAndMatch(tempList, map);
         }
-
         // lower / diagonal
         for (int k = dim - 2; k >= 2; k--)
         {
@@ -102,11 +102,9 @@ public class GridBase : MonoBehaviour
             {
                 int i = k - j;
                 tempList[j] = grid[dim - j - 1, i];
-                map[j] = new int[] { dim - j - 1, i };
+                map[j] = new int[2] { dim - j - 1, i };
             }
-            newScore += searchAndMatch(tempList, map);
         }
-
         // upper / diagonal
         for (int k = 2; k < dim; k++)
         {
@@ -116,25 +114,12 @@ public class GridBase : MonoBehaviour
             {
                 int j = dim - k - 1 + i;
                 tempList[i] = grid[i, j];
-                map[i] = new int[] { i, j };
+                map[i] = new int[2] { i, j };
             }
-            newScore += searchAndMatch(tempList, map);
-        }
-
-        score = newScore;
-        UpdateScore();
-        if (GameManager.GetInstance().turnCount == 54)
-        {
-            GameManager.GetInstance().GameOver();
-            EventManager.GetInstance().PostNotification(EVENT_TYPE.GAMEOVER);
-        }
-        else
-        {
-            GameManager.GetInstance().NextTurn();
         }
     }
 
-    int searchAndMatch(int[] tempList, Dictionary<int, int[]> map)
+    void searchAndMatch(int[] tempList, Dictionary<int, int[]> map)
     {
         int u = 0;
         int len = tempList.Length;
@@ -160,17 +145,17 @@ public class GridBase : MonoBehaviour
                 u = v;
             }
         }
-        return newScore;
-    }
-
-    public void UpdateScore()
-    {
-        EventManager.GetInstance().PostNotification(EVENT_TYPE.SCORE_CHANGE, this, score);
     }
 
     public void UpdateState(GridState props)
     {
-        Debug.Log("ahihi");
+        var gridData = props.grid;
+        foreach (KeyValuePair<string, int> cell in gridData)
+        {
+            if (cell.Value == -1) continue;
+            var pos = KeyToGrid(cell.Key);
+            grid[pos[0], pos[1]] = cell.Value;
+        }
     }
 
     void DrawLine(Vector3 from, Vector3 to)

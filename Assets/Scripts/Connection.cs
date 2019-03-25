@@ -64,15 +64,15 @@ public class Connection : MonoBehaviour
             .Receive(Reply.Status.Timeout, reply => Debug.Log("Time out"));
     }
 
-    public void CreateNewGame()
+    public void CreateNewGame(string max_player = "2", string mode = "easy", string time_limit = "0", string password = "")
     {
         string gameID = "";
         var newGame = new Dictionary<string, object>
         {
-            {"max_player", "2"},
-            {"mode", "easy"},
-            {"time_limit", "0"},
-            {"password", ""}
+            {"max_player", max_player},
+            {"mode", mode},
+            {"time_limit", time_limit},
+            {"password", password}
         };
 
         lobbyChannel.Push("new_game", newGame)
@@ -81,7 +81,7 @@ public class Connection : MonoBehaviour
             gameID = reply.response.GetValue("game_id").ToString();
             currentGames.Add(gameID);
             EventManager.GetInstance().PostNotification(EVENT_TYPE.CREATE_GAME);
-            JoinGame(gameID, "");
+            JoinGame(gameID, password);
         })
         .Receive(Reply.Status.Error, reply => Debug.Log("Create new game failed."));
     }
@@ -117,6 +117,7 @@ public class Connection : MonoBehaviour
         });
         gameChannel.On("game:player_joined", data =>
         {
+            Debug.Log("On Player Joined");
             Debug.Log(MessageSerialization.Serialize(data));
         });
         gameChannel.On("game:started", data =>

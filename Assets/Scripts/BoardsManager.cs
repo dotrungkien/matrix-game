@@ -6,11 +6,11 @@ using Newtonsoft.Json.Linq;
 
 public struct GridState
 {
-    int points;
-    string player_id;
-    string nick;
-    Dictionary<string, int> grid;
-    string game_id;
+    public int points;
+    public string player_id;
+    public string nick;
+    public Dictionary<string, int> grid;
+    public string game_id;
 }
 
 public class BoardsManager : MonoBehaviour
