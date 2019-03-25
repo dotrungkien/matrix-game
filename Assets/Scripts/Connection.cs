@@ -112,8 +112,10 @@ public class Connection : MonoBehaviour, IListener
         gameChannel.On("game:new_piece", data =>
         {
             // Debug.Log(string.Format("------on new_piece------ {0}", MessageSerialization.Serialize(data)));
+
             var piece = data.payload["piece"];
             int[] pieceVal = piece.ToObject<int[]>();
+            SoundManager.GetInstance().MakeClickSound();
             EventManager.GetInstance().PostNotification(EVENT_TYPE.NEW_PIECE, this, pieceVal);
         });
         gameChannel.On("game:player_joined", data =>
