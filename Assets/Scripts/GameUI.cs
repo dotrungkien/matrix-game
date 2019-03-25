@@ -29,6 +29,7 @@ public class GameUI : MonoBehaviour, IListener
     {
         lobbyPanel.SetActive(true);
         createGameButton.onClick.AddListener(CreateGame);
+        createGameButton.gameObject.SetActive(false);
         joinGameButton.onClick.AddListener(JoinGame);
         setUsername.onClick.AddListener(SetName);
         usernameInput.text = PlayerPrefs.GetString("username", "");
@@ -38,6 +39,7 @@ public class GameUI : MonoBehaviour, IListener
         gameManager = GameManager.GetInstance();
         player1Score.text = "PLAYER 1: " + gameManager.player1Score;
         player2Score.text = "PLAYER 2: " + gameManager.player2Score;
+        EventManager.GetInstance().AddListener(EVENT_TYPE.SOCKET_READY, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.SCORE_CHANGE, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.GAMEOVER, this);
         readyButton.onClick.AddListener(Ready);
@@ -72,6 +74,9 @@ public class GameUI : MonoBehaviour, IListener
     {
         switch (eventType)
         {
+            case EVENT_TYPE.SOCKET_READY:
+                createGameButton.gameObject.SetActive(true);
+                break;
             case EVENT_TYPE.SCORE_CHANGE:
                 if (sender.tag == Constants.GRID1_TAG) player1Score.text = string.Format("PLAYER 1: {0}", (int)param);
                 if (sender.tag == Constants.GRID2_TAG) player2Score.text = string.Format("PLAYER 2: {0}", (int)param);

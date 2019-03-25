@@ -4,12 +4,13 @@ using System.Collections;
 
 public enum EVENT_TYPE
 {
-    GAMEOVER,
+    SOCKET_READY,
     NEXT_PLAYER,
     NEW_PIECE,
     SCORE_CHANGE,
     CREATE_GAME,
     JOIN_GAME,
+    GAMEOVER,
 }
 
 public interface IListener

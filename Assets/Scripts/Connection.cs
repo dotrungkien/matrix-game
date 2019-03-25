@@ -9,7 +9,6 @@ public class Connection : MonoBehaviour
 {
     [HideInInspector]
     public string userID;
-    public BoardsManager boards;
 
     List<string> currentGames = new List<string>();
     private Socket socket = null;
@@ -59,7 +58,11 @@ public class Connection : MonoBehaviour
         });
         var param = new Dictionary<string, object> { };
         lobbyChannel.Join(param)
-            .Receive(Reply.Status.Ok, reply => Debug.Log("Join lobbyChannel ok."))
+            .Receive(Reply.Status.Ok, reply =>
+            {
+                EventManager.GetInstance().PostNotification(EVENT_TYPE.SOCKET_READY);
+                Debug.Log("Join lobbyChannel ok.");
+            })
             .Receive(Reply.Status.Error, reply => Debug.Log("Join lobbyChannel failed."))
             .Receive(Reply.Status.Timeout, reply => Debug.Log("Time out"));
     }
@@ -130,7 +133,7 @@ public class Connection : MonoBehaviour
                 GridState state = new GridState(
                         player_id, player_nick, point, game_id, grid
                     );
-                boards.SpawnGrid(i, state);
+                GameManager.GetInstance().UpdateGrid(i, state);
             }
 
             // Debug.Log(MessageSerialization.Serialize(data));
@@ -155,9 +158,21 @@ public class Connection : MonoBehaviour
         });
         gameChannel.On("game:place_piece", data =>
         {
-            // {"topic":"game:shipshape-foul-545","event":"game:place_piece","ref":null,"payload":{"player_id":"HU6OY-oh","piece":{"y":0,"x":8,"values":[7,9,7]},"game":{"turn":1,"time_limit":0,"spectators":[],"spectator_nicks":{},"points":{"HU6OY-oh":0,"2f250712-f039-4665-aac2-7149738da179":0},"players":["2f250712-f039-4665-aac2-7149738da179","HU6OY-oh"],"player_states":{"HU6OY-oh":"ready","2f250712-f039-4665-aac2-7149738da179":"moving"},"player_nicks":["Kien","sâfsafs"],"player_boards":{"HU6OY-oh":{"points":0,"player_id":"HU6OY-oh","nick":"sâfsafs","grid":{"86":-1,"70":-1,"53":-1,"33":-1,"60":-1,"47":-1,"08":7,"05":-1,"51":-1,"01":-1,"38":-1,"48":-1,"56":-1,"62":-1,"21":-1,"03":-1,"22":-1,"20":-1,"66":-1,"30":-1,"02":-1,"76":-1,"41":-1,"43":-1,"31":-1,"72":-1,"84":-1,"88":-1,"23":-1,"00":-1,"83":-1,"35":-1,"27":-1,"18":9,"80":-1,"67":-1,"54":-1,"28":7,"65":-1,"25":-1,"63":-1,"85":-1,"17":-1,"15":-1,"40":-1,"11":-1,"45":-1,"57":-1,"68":-1,"74":-1,"52":-1,"73":-1,"44":-1,"04":-1,"13":-1,"55":-1,"50":-1,"06":-1,"46":-1,"82":-1,"32":-1,"77":-1,"34":-1,"07":-1,"64":-1,"26":-1,"81":-1,"16":-1,"36":-1,"42":-1,"12":-1,"71":-1,"75":-1,"14":-1,"24":-1,"87":-1,"78":-1,"37":-1,"10":-1,"58":-1,"61":-1},"game_id":"shipshape-foul-545"},"2f250712-f039-4665-aac2-7149738da179":{"points":0,"player_id":"2f250712-f039-4665-aac2-7149738da179","nick":"Kien","grid":{"86":-1,"70":-1,"53":-1,"33":-1,"60":-1,"47":-1,"08":-1,"05":-1,"51":-1,"01":-1,"38":-1,"48":-1,"56":-1,"62":-1,"21":-1,"03":-1,"22":-1,"20":-1,"66":-1,"30":-1,"02":-1,"76":-1,"41":-1,"43":-1,"31":-1,"72":-1,"84":-1,"88":-1,"23":-1,"00":-1,"83":-1,"35":-1,"27":-1,"18":-1,"80":-1,"67":-1,"54":-1,"28":-1,"65":-1,"25":-1,"63":-1,"85":-1,"17":-1,"15":-1,"40":-1,"11":-1,"45":-1,"57":-1,"68":-1,"74":-1,"52":-1,"73":-1,"44":-1,"04":-1,"13":-1,"55":-1,"50":-1,"06":-1,"46":-1,"82":-1,"32":-1,"77":-1,"34":-1,"07":-1,"64":-1,"26":-1,"81":-1,"16":-1,"36":-1,"42":-1,"12":-1,"71":-1,"75":-1,"14":-1,"24":-1,"87":-1,"78":-1,"37":-1,"10":-1,"58":-1,"61":-1},"game_id":"shipshape-foul-545"}},"piece_values":[7,9,7],"phase":"running","mode":"easy","max_player":2,"locked":false,"id":"shipshape-foul-545"}}}
-            Debug.Log(MessageSerialization.Serialize(data));
-            string sender = data.payload["player_id"].ToObject<string>();
+            var game = data.payload["game"];
+            string[] players = game["players"].ToObject<string[]>();
+            string currentPlayer = "";
+            int i = 0;
+            for (i = 0; i < players.Length; i++)
+            {
+                currentPlayer = players[i];
+                Debug.Log(string.Format("{0} {1}", players[i], game["player_states"][currentPlayer]));
+                if ((string)game["player_states"][currentPlayer] == "ready") break;
+            }
+            if (currentPlayer == "" || i >= players.Length) return;
+            Dictionary<string, int> gridData = game["player_boards"][currentPlayer]["grid"].ToObject<Dictionary<string, int>>();
+            Debug.Log(string.Format("connection, i = " + i));
+            GameManager.GetInstance().UpdateGridData(i, gridData);
+            GameManager.GetInstance().turn = game["turn"].ToObject<int>();
         });
     }
 

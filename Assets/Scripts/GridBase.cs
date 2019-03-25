@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json.Linq;
@@ -10,8 +11,8 @@ public class GridBase : MonoBehaviour
 
     public int[] KeyToGrid(string key)
     {
-        int x = (int)key[0];
-        int y = (int)key[1];
+        int x = Convert.ToInt32(key[0]);
+        int y = Convert.ToInt32(key[1]);
         return new int[2] { x, y };
     }
 
@@ -153,6 +154,17 @@ public class GridBase : MonoBehaviour
         {
             if (cell.Value == -1) continue;
             var pos = KeyToGrid(cell.Key);
+            grid[pos[0], pos[1]] = cell.Value;
+        }
+    }
+
+    public void UpdateData(Dictionary<string, int> gridData)
+    {
+        foreach (KeyValuePair<string, int> cell in gridData)
+        {
+            if (cell.Value == -1) continue;
+            var pos = KeyToGrid(cell.Key);
+            // Debug.Log(string.Format("x = {0}, y = {1}", pos[0], pos[1]));
             grid[pos[0], pos[1]] = cell.Value;
         }
     }
