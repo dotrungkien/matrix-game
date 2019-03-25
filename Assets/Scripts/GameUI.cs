@@ -15,7 +15,7 @@ public class GameUI : MonoBehaviour, IListener
     public InputField usernameInput;
     public Button setUsername;
     public Button createGameButton;
-    public Button joinGameButton;
+
     //game panel
     public GameObject gamePanel;
     public Text myScore;
@@ -29,7 +29,6 @@ public class GameUI : MonoBehaviour, IListener
         lobbyPanel.SetActive(true);
         createGameButton.onClick.AddListener(CreateGame);
         createGameButton.gameObject.SetActive(false);
-        joinGameButton.onClick.AddListener(JoinGame);
         setUsername.onClick.AddListener(SetName);
         usernameInput.text = PlayerPrefs.GetString("username", "");
 
@@ -46,14 +45,6 @@ public class GameUI : MonoBehaviour, IListener
     {
         SoundManager.GetInstance().MakeClickSound();
         connection.CreateNewGame();
-        lobbyPanel.SetActive(false);
-        gamePanel.SetActive(true);
-    }
-
-    public void JoinGame()
-    {
-        SoundManager.GetInstance().MakeClickSound();
-        connection.JoinGame(gameID, "");
         lobbyPanel.SetActive(false);
         gamePanel.SetActive(true);
     }

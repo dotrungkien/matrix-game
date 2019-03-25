@@ -11,6 +11,7 @@ public class Connection : MonoBehaviour, IListener
     public string myID;
 
     public GameManager gameManager;
+    public ListGames listGames;
 
     List<string> currentGames = new List<string>();
     private Socket socket = null;
@@ -55,13 +56,17 @@ public class Connection : MonoBehaviour, IListener
     void JoinLobby()
     {
         lobbyChannel = socket.MakeChannel("lobby");
-        lobbyChannel.On("new_game", data =>
-        {
-            Debug.Log(string.Format("------on new_game------ {0}", MessageSerialization.Serialize(data)));
-        });
         lobbyChannel.On("update_games", data =>
         {
             Debug.Log(string.Format("------on update_games------ {0}", MessageSerialization.Serialize(data)));
+            var gamesData = data.payload["games"];
+            List<string> games = new List<string>();
+            foreach (JToken item in gamesData)
+            {
+                games.Add((string)item["id"]);
+            }
+            Debug.Log(string.Join(" ", games));
+            listGames.UpdateGames(games);
         });
         var param = new Dictionary<string, object> { };
         lobbyChannel.Join(param)
