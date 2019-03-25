@@ -3,13 +3,16 @@ using System.Collections;
 
 public class InputManager : MonoBehaviour
 {
+    private GameManager gameManager;
+
     private bool draggingItem = false;
     private GameObject draggedObject;
     private Vector2 touchOffset;
 
     void Update()
     {
-        if (GameManager.GetInstance().isGameOver) return;
+        gameManager = GetComponent<GameManager>();
+        if (gameManager.isGameOver) return;
         if (Input.GetMouseButton(0))
         {
             DragOrPickUp();
@@ -45,7 +48,6 @@ public class InputManager : MonoBehaviour
             if (touches.Length > 0)
             {
                 var hit = touches[0];
-                int turn = GameManager.GetInstance().turn;
                 if (hit.transform != null && hit.transform.tag == Constants.MOVABLE_TAG)
                 {
                     draggingItem = true;

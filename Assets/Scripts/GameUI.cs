@@ -7,6 +7,7 @@ using UnityEngine.UI;
 public class GameUI : MonoBehaviour, IListener
 {
     public string gameID;
+    public GameManager gameManager;
     public Connection connection;
 
     // lobby panel
@@ -20,11 +21,8 @@ public class GameUI : MonoBehaviour, IListener
     public Text myScore;
     public Text otherScore;
     public GameObject gameOverPanel;
-    public Text player1Result;
-    public Text player2Result;
     public Button readyButton;
-
-    GameManager gameManager;
+    public Button restartButton;
 
     void Start()
     {
@@ -37,11 +35,11 @@ public class GameUI : MonoBehaviour, IListener
 
         gamePanel.SetActive(false);
         gameOverPanel.SetActive(false);
-        gameManager = GameManager.GetInstance();
         EventManager.GetInstance().AddListener(EVENT_TYPE.SOCKET_READY, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.SCORE_CHANGE, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.GAMEOVER, this);
         readyButton.onClick.AddListener(Ready);
+        restartButton.onClick.AddListener(gameManager.Restart);
     }
 
     public void CreateGame()

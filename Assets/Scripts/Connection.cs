@@ -10,6 +10,8 @@ public class Connection : MonoBehaviour, IListener
     [HideInInspector]
     public string myID;
 
+    public GameManager gameManager;
+
     List<string> currentGames = new List<string>();
     private Socket socket = null;
     private Channel lobbyChannel;
@@ -84,7 +86,6 @@ public class Connection : MonoBehaviour, IListener
         {
             gameID = reply.response.GetValue("game_id").ToString();
             currentGames.Add(gameID);
-            EventManager.GetInstance().PostNotification(EVENT_TYPE.CREATE_GAME);
             JoinGame(gameID, password);
         })
         .Receive(Reply.Status.Error, reply => Debug.Log("Create new game failed."));
@@ -100,11 +101,7 @@ public class Connection : MonoBehaviour, IListener
             {"password", password}
         };
         gameChannel.Join(param)
-            .Receive(Reply.Status.Ok, reply =>
-            {
-                Debug.Log(string.Format("Join game {0} ok.", gameID));
-                EventManager.GetInstance().PostNotification(EVENT_TYPE.JOIN_GAME);
-            })
+            .Receive(Reply.Status.Ok, reply => Debug.Log(string.Format("Join game {0} ok.", gameID)))
             .Receive(Reply.Status.Error, reply => Debug.Log(string.Format("Join game {0} failed.", gameID)))
             .Receive(Reply.Status.Timeout, reply => Debug.Log("Time out"));
     }
@@ -136,7 +133,7 @@ public class Connection : MonoBehaviour, IListener
                 GridState state = new GridState(
                         player_id, player_nick, point, game_id, grid
                     );
-                GameManager.GetInstance().UpdateGrid(player_id, state);
+                gameManager.UpdateGrid(player_id, state);
             }
         });
         gameChannel.On("game:started", data =>
@@ -151,11 +148,13 @@ public class Connection : MonoBehaviour, IListener
         gameChannel.On("game:player_left", data =>
         {
             Debug.Log(MessageSerialization.Serialize(data));
+            EventManager.GetInstance().PostNotification(EVENT_TYPE.PLAYER_LEFT);
 
         });
         gameChannel.On("game:over", data =>
         {
             Debug.Log(MessageSerialization.Serialize(data));
+            EventManager.GetInstance().PostNotification(EVENT_TYPE.GAMEOVER);
 
         });
         gameChannel.On("game:place_piece", data =>
@@ -169,8 +168,7 @@ public class Connection : MonoBehaviour, IListener
             var param = new KeyValuePair<string, string>(player_nick, point);
             EventManager.GetInstance().PostNotification(EVENT_TYPE.SCORE_CHANGE, null, param);
             var piece = data.payload["piece"];
-            GameManager.GetInstance().UpdateGridData(sender, gridData, piece);
-            GameManager.GetInstance().turn = game["turn"].ToObject<int>();
+            gameManager.UpdateGridData(sender, gridData, piece);
         });
     }
 

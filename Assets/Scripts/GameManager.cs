@@ -22,19 +22,16 @@ public struct GridState
     }
 }
 
-public class GameManager : Singleton<GameManager>, IListener
+public class GameManager : MonoBehaviour, IListener
 {
     public Tile tilePrefab;
-    public Transform tileSpawnPos1;
-    public Transform tileSpawnPos2;
+    public Transform tileSpawnPos;
 
     public GridBase gridPrefab;
     public Transform grid1SpawnPos;
     public Transform grid2SpawnPos;
 
     public bool isGameOver = false;
-
-    public int turn;
 
     private string myID;
     private Dictionary<string, GridBase> grids = new Dictionary<string, GridBase>();
@@ -68,19 +65,11 @@ public class GameManager : Singleton<GameManager>, IListener
         grids[player_id].UpdateData(gridData);
     }
 
-    public int NextTurn()
-    {
-        turn = turn == 0 ? 1 : 0;
-        return turn;
-    }
-
     public void SpawnNewTiles(int[] piece)
     {
-        Tile tile1 = Instantiate(tilePrefab, tileSpawnPos1.position, Quaternion.identity, tileSpawnPos1);
-        tile1.transform.tag = Constants.MOVABLE_TAG;
-        tile1.SetVal(piece);
-        // Tile tile2 = Instantiate(tilePrefab, tileSpawnPos2.position, Quaternion.identity, tileSpawnPos2);
-        // tile2.SetVal(piece);
+        Tile tile = Instantiate(tilePrefab, tileSpawnPos.position, Quaternion.identity, tileSpawnPos);
+        tile.transform.tag = Constants.MOVABLE_TAG;
+        tile.SetVal(piece);
     }
 
     public void GameOver()
@@ -90,8 +79,6 @@ public class GameManager : Singleton<GameManager>, IListener
 
     public void Restart()
     {
-        turn = 0;
-        isGameOver = false;
         SceneManager.LoadScene("Game");
     }
 
@@ -101,6 +88,12 @@ public class GameManager : Singleton<GameManager>, IListener
         {
             case EVENT_TYPE.GAMEOVER:
                 GameOver();
+                break;
+            case EVENT_TYPE.PLAYER_LEFT:
+                GameOver();
+                break;
+            case EVENT_TYPE.RESTART:
+                Restart();
                 break;
             case EVENT_TYPE.NEW_PIECE:
                 int[] pieceVal = (int[])param;

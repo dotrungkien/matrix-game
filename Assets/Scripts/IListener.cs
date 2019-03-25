@@ -5,13 +5,12 @@ using System.Collections;
 public enum EVENT_TYPE
 {
     SOCKET_READY,
-    NEXT_PLAYER,
     NEW_PIECE,
     PLACE_PIECE,
     SCORE_CHANGE,
-    CREATE_GAME,
-    JOIN_GAME,
+    PLAYER_LEFT,
     GAMEOVER,
+    RESTART,
 }
 
 public interface IListener

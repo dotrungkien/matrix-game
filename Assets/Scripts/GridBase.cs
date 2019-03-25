@@ -185,6 +185,7 @@ public class GridBase : MonoBehaviour
     void DrawLine(Vector3 from, Vector3 to)
     {
         GameObject newLine = new GameObject("new line");
+        newLine.transform.parent = transform;
         LineRenderer lineRenderer = newLine.AddComponent<LineRenderer>();
         lineRenderer.positionCount = 0;
         lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
