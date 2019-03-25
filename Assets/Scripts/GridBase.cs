@@ -8,6 +8,7 @@ public class GridBase : MonoBehaviour
     public Tile renderTile;
     public float cellSize = 0.5f;
     int[,] grid = new int[9, 9];
+    private int dim = 9;
 
     public int[] KeyToGrid(string key)
     {
@@ -43,8 +44,6 @@ public class GridBase : MonoBehaviour
 
     public void UpdateStatus()
     {
-        int dim = 9;
-
         // Columns
         for (int i = 0; i < dim; i++)
         {
@@ -162,7 +161,7 @@ public class GridBase : MonoBehaviour
     public void PlacePiece(JToken piece)
     {
         int x = (int)piece["x"];
-        int y = 3 * (int)piece["y"] + 1;
+        int y = dim - 2 - 3 * (int)piece["y"];
         Vector3 placePos = GridToPos(new int[2] { x, y });
         Tile newTile = Instantiate(renderTile, placePos, Quaternion.identity, transform);
         newTile.SetVal(piece["values"].ToObject<int[]>());

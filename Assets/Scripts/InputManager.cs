@@ -36,7 +36,7 @@ public class InputManager : MonoBehaviour
         {
             var tile = draggedObject.GetComponent<Tile>();
             if (!tile) return;
-            if (tile.movable) draggedObject.transform.position = inputPosition + touchOffset;
+            if (tile.tag == Constants.MOVABLE_TAG) draggedObject.transform.position = inputPosition + touchOffset;
         }
         else
         {
@@ -46,8 +46,7 @@ public class InputManager : MonoBehaviour
             {
                 var hit = touches[0];
                 int turn = GameManager.GetInstance().turn;
-                string tag = turn == 0 ? "Player1" : "Player2";
-                if (hit.transform != null && hit.transform.tag == tag)
+                if (hit.transform != null && hit.transform.tag == Constants.MOVABLE_TAG)
                 {
                     draggingItem = true;
                     draggedObject = hit.transform.gameObject;
@@ -62,7 +61,7 @@ public class InputManager : MonoBehaviour
     {
         draggingItem = false;
         draggedObject.transform.localScale = new Vector3(1, 1, 1);
-        if (draggedObject.GetComponent<Tile>().movable)
+        if (draggedObject.tag == Constants.MOVABLE_TAG)
         {
             draggedObject.GetComponent<Tile>().Drop();
         }

@@ -53,7 +53,7 @@ public class GameManager : Singleton<GameManager>, IListener
         if (spawnPosition.childCount == 0)
         {
             GridBase grid = Instantiate(gridPrefab, spawnPosition.position, Quaternion.identity, spawnPosition);
-            grid.transform.tag = player_id == myID ? Constants.GRID1_TAG : Constants.GRID2_TAG;
+            if (player_id == myID) grid.transform.tag = Constants.PLACEABLE_TAG;
             grids[player_id] = grid;
         }
         grids[player_id].UpdateState(state);
@@ -74,10 +74,10 @@ public class GameManager : Singleton<GameManager>, IListener
     public void SpawnNewTiles(int[] piece)
     {
         Tile tile1 = Instantiate(tilePrefab, tileSpawnPos1.position, Quaternion.identity, tileSpawnPos1);
+        tile1.transform.tag = Constants.MOVABLE_TAG;
         tile1.SetVal(piece);
         Tile tile2 = Instantiate(tilePrefab, tileSpawnPos2.position, Quaternion.identity, tileSpawnPos2);
         tile2.SetVal(piece);
-        tile2.movable = false;
     }
 
     public void GameOver()
