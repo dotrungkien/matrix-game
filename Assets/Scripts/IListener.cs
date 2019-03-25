@@ -7,6 +7,7 @@ public enum EVENT_TYPE
     SOCKET_READY,
     NEW_PIECE,
     PLACE_PIECE,
+    JOIN_GAME,
     SCORE_CHANGE,
     PLAYER_LEFT,
     GAMEOVER,

@@ -55,9 +55,13 @@ public class Connection : MonoBehaviour, IListener
     void JoinLobby()
     {
         lobbyChannel = socket.MakeChannel("lobby");
-        lobbyChannel.On("current_games", data =>
+        lobbyChannel.On("new_game", data =>
         {
-            Debug.Log(MessageSerialization.Serialize(data));
+            Debug.Log(string.Format("------on new_game------ {0}", MessageSerialization.Serialize(data)));
+        });
+        lobbyChannel.On("update_games", data =>
+        {
+            Debug.Log(string.Format("------on update_games------ {0}", MessageSerialization.Serialize(data)));
         });
         var param = new Dictionary<string, object> { };
         lobbyChannel.Join(param)
