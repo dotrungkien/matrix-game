@@ -24,6 +24,7 @@ public class GameInfo : MonoBehaviour
 
     public void JoinGame()
     {
+        Debug.Log("join game " + _gameID);
         EventManager.GetInstance().PostNotification(EVENT_TYPE.JOIN_GAME, this, _gameID);
     }
 }
