@@ -36,10 +36,12 @@ public class GameManager : Singleton<GameManager>, IListener
 
     public int turn;
 
+    private string myID;
     private Dictionary<string, GridBase> grids = new Dictionary<string, GridBase>();
 
     void Start()
     {
+        myID = PlayerPrefs.GetString("myID", "");
         EventManager.GetInstance().AddListener(EVENT_TYPE.SCORE_CHANGE, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.GAMEOVER, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.NEW_PIECE, this);
@@ -47,8 +49,6 @@ public class GameManager : Singleton<GameManager>, IListener
 
     public void UpdateGrid(string player_id, GridState state)
     {
-        string myID = PlayerPrefs.GetString("myID", "");
-        Debug.Log(string.Format("playerID {0} myID {1}", player_id, myID));
         Transform spawnPosition = player_id == myID ? grid1SpawnPos : grid2SpawnPos;
         if (spawnPosition.childCount == 0)
         {
@@ -61,7 +61,10 @@ public class GameManager : Singleton<GameManager>, IListener
 
     public void UpdateGridData(string player_id, Dictionary<string, int> gridData, JToken piece)
     {
-        grids[player_id].PlacePiece(piece);
+        if (myID != player_id)
+        {
+            grids[player_id].PlacePiece(piece);
+        }
         grids[player_id].UpdateData(gridData);
     }
 
@@ -76,8 +79,8 @@ public class GameManager : Singleton<GameManager>, IListener
         Tile tile1 = Instantiate(tilePrefab, tileSpawnPos1.position, Quaternion.identity, tileSpawnPos1);
         tile1.transform.tag = Constants.MOVABLE_TAG;
         tile1.SetVal(piece);
-        Tile tile2 = Instantiate(tilePrefab, tileSpawnPos2.position, Quaternion.identity, tileSpawnPos2);
-        tile2.SetVal(piece);
+        // Tile tile2 = Instantiate(tilePrefab, tileSpawnPos2.position, Quaternion.identity, tileSpawnPos2);
+        // tile2.SetVal(piece);
     }
 
     public void GameOver()

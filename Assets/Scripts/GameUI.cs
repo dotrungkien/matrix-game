@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,8 +17,8 @@ public class GameUI : MonoBehaviour, IListener
     public Button joinGameButton;
     //game panel
     public GameObject gamePanel;
-    public Text player1Score;
-    public Text player2Score;
+    public Text myScore;
+    public Text otherScore;
     public GameObject gameOverPanel;
     public Text player1Result;
     public Text player2Result;
@@ -76,8 +77,16 @@ public class GameUI : MonoBehaviour, IListener
                 createGameButton.gameObject.SetActive(true);
                 break;
             case EVENT_TYPE.SCORE_CHANGE:
-                if (sender.tag == Constants.GRID1_TAG) player1Score.text = string.Format("PLAYER 1: {0}", (int)param);
-                if (sender.tag == Constants.GRID2_TAG) player2Score.text = string.Format("PLAYER 2: {0}", (int)param);
+                KeyValuePair<string, string> playerScore = (KeyValuePair<string, string>)param;
+                if (playerScore.Key == PlayerPrefs.GetString("username", ""))
+                {
+                    myScore.text = string.Format("{0}: {1}", playerScore.Key, playerScore.Value);
+                }
+                else
+                {
+                    otherScore.text = string.Format("{0}: {1}", playerScore.Key, playerScore.Value);
+                }
+
                 break;
             case EVENT_TYPE.GAMEOVER:
                 gameOverPanel.SetActive(true);

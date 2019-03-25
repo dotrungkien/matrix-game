@@ -55,7 +55,6 @@ public class Tile : MonoBehaviour
         Vector2 newPosition;
         if (touchingTiles.Count == 0)
         {
-            Debug.Log("no touching tiles found");
             transform.position = startingPosition;
             transform.parent = myParent;
             return;
@@ -80,18 +79,14 @@ public class Tile : MonoBehaviour
             }
             newPosition = currentCell.position;
         }
-        // if (!currentCell.CompareTag(transform.tag)) return;
-        Debug.Log("current cell " + currentCell.name);
         if (currentCell.childCount != 0)
         {
-            Debug.Log("back to start");
             transform.position = startingPosition;
             transform.parent = myParent;
             return;
         }
         else
         {
-            Debug.Log("place in slot");
             transform.parent = currentCell;
             StartCoroutine(SlotIntoPlace(transform.position, newPosition));
         }
@@ -103,10 +98,8 @@ public class Tile : MonoBehaviour
     {
         if (other.tag != "Cell") return;
         if (other.transform.parent.parent.tag != Constants.PLACEABLE_TAG) return;
-        Debug.Log("check touching tile contain");
         if (!touchingTiles.Contains(other.transform))
         {
-            Debug.Log("contained");
             touchingTiles.Add(other.transform);
         }
     }
@@ -132,10 +125,15 @@ public class Tile : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         transform.position = endingPos;
+
         // GridManager gridManager = transform.parent.parent.parent.GetComponent<GridManager>();
-        // int[] cell = gridManager.PosToGrid(endingPos);
+        GridBase gridBase = transform.parent.parent.parent.GetComponent<GridBase>();
+        int[] cell = gridBase.PosToGrid(endingPos);
+        gridBase.UpdateGridVal(cell[0], cell[1], topVal, midVal, botVal);
+        cell[1] = (8 - cell[1]) / 3;
+        EventManager.GetInstance().PostNotification(EVENT_TYPE.PLACE_PIECE, this, cell);
         // Debug.Log("Place on x= " + cell[0] + ", y= " + cell[1]);
         // GameManager.GetInstance().SpawnNewTile();
-        // gridManager.UpdateGridVal(cell[0], cell[1], topVal, midVal, botVal);
+
     }
 }

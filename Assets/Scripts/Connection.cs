@@ -5,7 +5,7 @@ using UnityEngine;
 using Phoenix;
 using Newtonsoft.Json.Linq;
 
-public class Connection : MonoBehaviour
+public class Connection : MonoBehaviour, IListener
 {
     [HideInInspector]
     public string myID;
@@ -24,6 +24,7 @@ public class Connection : MonoBehaviour
             PlayerPrefs.SetString("myID", myID);
         }
         SocketConnect();
+        EventManager.GetInstance().AddListener(EVENT_TYPE.PLACE_PIECE, this);
     }
 
     void SocketConnect()
@@ -113,7 +114,7 @@ public class Connection : MonoBehaviour
         gameChannel = socket.MakeChannel(string.Format("game:{0}", gameID));
         gameChannel.On("game:new_piece", data =>
         {
-            Debug.Log(string.Format("------on new_piece------ {0}", MessageSerialization.Serialize(data)));
+            // Debug.Log(string.Format("------on new_piece------ {0}", MessageSerialization.Serialize(data)));
             var piece = data.payload["piece"];
             int[] pieceVal = piece.ToObject<int[]>();
             EventManager.GetInstance().PostNotification(EVENT_TYPE.NEW_PIECE, this, pieceVal);
@@ -128,6 +129,8 @@ public class Connection : MonoBehaviour
                 string player_id = players[i];
                 string player_nick = player_nicks[i];
                 int point = game["points"][player_id].ToObject<int>();
+                var param = new KeyValuePair<string, string>(player_nick, (string)game["points"][player_id]);
+                EventManager.GetInstance().PostNotification(EVENT_TYPE.SCORE_CHANGE, null, param);
                 string game_id = game["id"].ToObject<string>();
                 Dictionary<string, int> grid = game["player_boards"][player_id]["grid"].ToObject<Dictionary<string, int>>();
                 GridState state = new GridState(
@@ -135,8 +138,6 @@ public class Connection : MonoBehaviour
                     );
                 GameManager.GetInstance().UpdateGrid(player_id, state);
             }
-
-            // Debug.Log(MessageSerialization.Serialize(data));
         });
         gameChannel.On("game:started", data =>
         {
@@ -145,6 +146,7 @@ public class Connection : MonoBehaviour
         gameChannel.On("game:stopped", data =>
         {
             Debug.Log(MessageSerialization.Serialize(data));
+            EventManager.GetInstance().PostNotification(EVENT_TYPE.GAMEOVER);
         });
         gameChannel.On("game:player_left", data =>
         {
@@ -158,10 +160,14 @@ public class Connection : MonoBehaviour
         });
         gameChannel.On("game:place_piece", data =>
         {
-            Debug.Log(string.Format("------on place_piece----- {0}", MessageSerialization.Serialize(data)));
+            // Debug.Log(string.Format("------on place_piece----- {0}", MessageSerialization.Serialize(data)));
             var game = data.payload["game"];
             string sender = (string)data.payload["player_id"];
+            string player_nick = (string)game["player_boards"][sender]["nick"];
             Dictionary<string, int> gridData = game["player_boards"][sender]["grid"].ToObject<Dictionary<string, int>>();
+            string point = (string)game["points"][sender];
+            var param = new KeyValuePair<string, string>(player_nick, point);
+            EventManager.GetInstance().PostNotification(EVENT_TYPE.SCORE_CHANGE, null, param);
             var piece = data.payload["piece"];
             GameManager.GetInstance().UpdateGridData(sender, gridData, piece);
             GameManager.GetInstance().turn = game["turn"].ToObject<int>();
@@ -185,5 +191,25 @@ public class Connection : MonoBehaviour
     void OnApplicationQuit()
     {
         PlayerPrefs.DeleteKey("myID");
+    }
+
+
+    public void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
+    {
+        switch (eventType)
+        {
+            case EVENT_TYPE.PLACE_PIECE:
+                int[] coord = (int[])param;
+                var pieceCoord = new Dictionary<string, object>
+                {
+                    {"x", coord[0]},
+                    {"y", coord[1] * 3},
+                };
+
+                gameChannel.Push("game:place_piece", pieceCoord);
+                break;
+            default:
+                break;
+        }
     }
 }

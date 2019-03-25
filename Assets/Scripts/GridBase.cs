@@ -54,6 +54,7 @@ public class GridBase : MonoBehaviour
                 tempList[j] = grid[i, j];
                 map[j] = new int[2] { i, j };
             }
+            searchAndMatch(tempList, map);
         }
         // Rows
         for (int j = 0; j < dim; j++)
@@ -65,6 +66,7 @@ public class GridBase : MonoBehaviour
                 tempList[i] = grid[i, j];
                 map[i] = new int[2] { i, j };
             }
+            searchAndMatch(tempList, map);
         }
         // lower \ diagonal
         for (int k = 2; k < dim; k++)
@@ -77,6 +79,7 @@ public class GridBase : MonoBehaviour
                 tempList[j] = grid[i, j];
                 map[j] = new int[2] { i, j };
             }
+            searchAndMatch(tempList, map);
         }
         // upper \ diagonal
         for (int k = dim - 2; k >= 2; k--)
@@ -90,6 +93,7 @@ public class GridBase : MonoBehaviour
                 tempList[j] = grid[dim - j - 1, dim - i - 1];
                 map[j] = new int[2] { dim - j - 1, dim - i - 1 };
             }
+            searchAndMatch(tempList, map);
         }
         // lower / diagonal
         for (int k = dim - 2; k >= 2; k--)
@@ -103,6 +107,7 @@ public class GridBase : MonoBehaviour
                 tempList[j] = grid[dim - j - 1, i];
                 map[j] = new int[2] { dim - j - 1, i };
             }
+            searchAndMatch(tempList, map);
         }
         // upper / diagonal
         for (int k = 2; k < dim; k++)
@@ -115,6 +120,7 @@ public class GridBase : MonoBehaviour
                 tempList[i] = grid[i, j];
                 map[i] = new int[2] { i, j };
             }
+            searchAndMatch(tempList, map);
         }
     }
 
@@ -122,7 +128,6 @@ public class GridBase : MonoBehaviour
     {
         int u = 0;
         int len = tempList.Length;
-        int newScore = 0;
         while (u < len - 1)
         {
             if (tempList[u] == 0 || tempList[u] != tempList[u + 1])
@@ -136,7 +141,6 @@ public class GridBase : MonoBehaviour
                 while (v < len && tempList[u] == tempList[v]) v++;
                 if (v - u >= 3)
                 {
-                    newScore += tempList[u] * (v - u);
                     Vector3 from = GridToPos(map[u]);
                     Vector3 to = GridToPos(map[v - 1]);
                     DrawLine(from, to);
@@ -161,7 +165,7 @@ public class GridBase : MonoBehaviour
     public void PlacePiece(JToken piece)
     {
         int x = (int)piece["x"];
-        int y = dim - 2 - 3 * (int)piece["y"];
+        int y = dim - 2 - (int)piece["y"];
         Vector3 placePos = GridToPos(new int[2] { x, y });
         Tile newTile = Instantiate(renderTile, placePos, Quaternion.identity, transform);
         newTile.SetVal(piece["values"].ToObject<int[]>());
@@ -173,7 +177,6 @@ public class GridBase : MonoBehaviour
         {
             if (cell.Value == -1) continue;
             var pos = KeyToGrid(cell.Key);
-            Debug.Log(string.Format("x = {0}, y = {1}", pos[0], pos[1], cell.Value));
             grid[pos[0], pos[1]] = cell.Value;
         }
         UpdateStatus();
