@@ -37,8 +37,6 @@ public class GameUI : MonoBehaviour, IListener
         gamePanel.SetActive(false);
         gameOverPanel.SetActive(false);
         gameManager = GameManager.GetInstance();
-        player1Score.text = "PLAYER 1: " + gameManager.player1Score;
-        player2Score.text = "PLAYER 2: " + gameManager.player2Score;
         EventManager.GetInstance().AddListener(EVENT_TYPE.SOCKET_READY, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.SCORE_CHANGE, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.GAMEOVER, this);
@@ -82,22 +80,6 @@ public class GameUI : MonoBehaviour, IListener
                 if (sender.tag == Constants.GRID2_TAG) player2Score.text = string.Format("PLAYER 2: {0}", (int)param);
                 break;
             case EVENT_TYPE.GAMEOVER:
-                if (gameManager.player1Score == gameManager.player2Score)
-                {
-                    player1Result.text = "DRAW";
-                    player2Result.text = "DRAW";
-                }
-                else if (gameManager.player1Score > gameManager.player2Score)
-                {
-                    player1Result.text = "WIN";
-                    player2Result.text = "LOSE";
-                }
-                else
-                {
-                    player1Result.text = "LOSE";
-                    player2Result.text = "WIN";
-                }
-
                 gameOverPanel.SetActive(true);
                 break;
             default:

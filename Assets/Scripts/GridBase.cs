@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json.Linq;
 
 public class GridBase : MonoBehaviour
 {
+    public Tile renderTile;
     public float cellSize = 0.5f;
     int[,] grid = new int[9, 9];
 
     public int[] KeyToGrid(string key)
     {
-        int x = Convert.ToInt32(key[0]);
-        int y = Convert.ToInt32(key[1]);
+        int y = '8' - key[0];
+        int x = key[1] - '0';
         return new int[2] { x, y };
     }
 
@@ -156,6 +156,16 @@ public class GridBase : MonoBehaviour
             var pos = KeyToGrid(cell.Key);
             grid[pos[0], pos[1]] = cell.Value;
         }
+        UpdateStatus();
+    }
+
+    public void PlacePiece(JToken piece)
+    {
+        int x = (int)piece["x"];
+        int y = 3 * (int)piece["y"] + 1;
+        Vector3 placePos = GridToPos(new int[2] { x, y });
+        Tile newTile = Instantiate(renderTile, placePos, Quaternion.identity, transform);
+        newTile.SetVal(piece["values"].ToObject<int[]>());
     }
 
     public void UpdateData(Dictionary<string, int> gridData)
@@ -164,9 +174,10 @@ public class GridBase : MonoBehaviour
         {
             if (cell.Value == -1) continue;
             var pos = KeyToGrid(cell.Key);
-            // Debug.Log(string.Format("x = {0}, y = {1}", pos[0], pos[1]));
+            Debug.Log(string.Format("x = {0}, y = {1}", pos[0], pos[1], cell.Value));
             grid[pos[0], pos[1]] = cell.Value;
         }
+        UpdateStatus();
     }
 
     void DrawLine(Vector3 from, Vector3 to)

@@ -121,15 +121,15 @@ public class GridManager : MonoBehaviour
 
         score = newScore;
         UpdateScore();
-        if (GameManager.GetInstance().turnCount == 54)
-        {
-            GameManager.GetInstance().GameOver();
-            EventManager.GetInstance().PostNotification(EVENT_TYPE.GAMEOVER);
-        }
-        else
-        {
-            GameManager.GetInstance().NextTurn();
-        }
+        // if (GameManager.GetInstance().turnCount == 54)
+        // {
+        //     GameManager.GetInstance().GameOver();
+        //     EventManager.GetInstance().PostNotification(EVENT_TYPE.GAMEOVER);
+        // }
+        // else
+        // {
+        //     GameManager.GetInstance().NextTurn();
+        // }
     }
 
     int searchAndMatch(int[] tempList, Dictionary<int, int[]> map)

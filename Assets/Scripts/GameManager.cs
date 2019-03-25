@@ -24,50 +24,45 @@ public struct GridState
 
 public class GameManager : Singleton<GameManager>, IListener
 {
-    public GameObject tile1;
-    public GameObject tile2;
+    public Tile tilePrefab;
     public Transform tileSpawnPos1;
     public Transform tileSpawnPos2;
 
-    public GameObject gridPrefab;
+    public GridBase gridPrefab;
     public Transform grid1SpawnPos;
     public Transform grid2SpawnPos;
 
-    public int player1Score;
-    public int player2Score;
-
-    public int turnCount = 0;
     public bool isGameOver = false;
 
     public int turn;
 
-    private Dictionary<int, GridBase> grids = new Dictionary<int, GridBase>();
+    private Dictionary<string, GridBase> grids = new Dictionary<string, GridBase>();
 
     void Start()
     {
-        // Instantiate(tile1, tileSpawnPos1.position, Quaternion.identity, tileSpawnPos1);
-        // Instantiate(tile2, tileSpawnPos2.position, Quaternion.identity, tileSpawnPos2);
         EventManager.GetInstance().AddListener(EVENT_TYPE.SCORE_CHANGE, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.GAMEOVER, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.NEW_PIECE, this);
     }
 
-    public void UpdateGrid(int id, GridState state)
+    public void UpdateGrid(string player_id, GridState state)
     {
-        Transform spawnPosition = id == 0 ? grid1SpawnPos : grid2SpawnPos;
+        string myID = PlayerPrefs.GetString("myID", "");
+        Debug.Log(string.Format("playerID {0} myID {1}", player_id, myID));
+        Transform spawnPosition = player_id == myID ? grid1SpawnPos : grid2SpawnPos;
         if (spawnPosition.childCount == 0)
         {
-            var gridObj = Instantiate(gridPrefab, spawnPosition.position, Quaternion.identity, spawnPosition);
-            gridObj.tag = id == 0 ? Constants.GRID1_TAG : Constants.GRID2_TAG;
-            GridBase grid = gridObj.GetComponent<GridBase>();
-            grids[id] = grid;
+            GridBase grid = Instantiate(gridPrefab, spawnPosition.position, Quaternion.identity, spawnPosition);
+            grid.transform.tag = player_id == myID ? Constants.GRID1_TAG : Constants.GRID2_TAG;
+            grids[player_id] = grid;
         }
-        grids[id].UpdateState(state);
+        grids[player_id].UpdateState(state);
     }
 
-    public void UpdateGridData(int id, Dictionary<string, int> gridData)
+    public void UpdateGridData(string player_id, Dictionary<string, int> gridData, JToken piece)
     {
-        grids[id].UpdateData(gridData);
+        grids[player_id].PlacePiece(piece);
+        grids[player_id].UpdateData(gridData);
     }
 
     public int NextTurn()
@@ -76,21 +71,13 @@ public class GameManager : Singleton<GameManager>, IListener
         return turn;
     }
 
-    public void SpawnNewTile(int[] piece)
+    public void SpawnNewTiles(int[] piece)
     {
-        turnCount += 1;
-        GameObject tileObj;
-        if (turn == 0)
-        {
-            tileObj = Instantiate(tile1, tileSpawnPos1.position, Quaternion.identity, tileSpawnPos1);
-
-        }
-        else
-        {
-            tileObj = Instantiate(tile2, tileSpawnPos2.position, Quaternion.identity, tileSpawnPos2);
-        }
-        Tile tile = tileObj.GetComponent<Tile>();
-        tile.SetVal(piece);
+        Tile tile1 = Instantiate(tilePrefab, tileSpawnPos1.position, Quaternion.identity, tileSpawnPos1);
+        tile1.SetVal(piece);
+        Tile tile2 = Instantiate(tilePrefab, tileSpawnPos2.position, Quaternion.identity, tileSpawnPos2);
+        tile2.SetVal(piece);
+        tile2.movable = false;
     }
 
     public void GameOver()
@@ -101,7 +88,6 @@ public class GameManager : Singleton<GameManager>, IListener
     public void Restart()
     {
         turn = 0;
-        turnCount = 0;
         isGameOver = false;
         SceneManager.LoadScene("Game");
     }
@@ -110,17 +96,12 @@ public class GameManager : Singleton<GameManager>, IListener
     {
         switch (eventType)
         {
-            case EVENT_TYPE.SCORE_CHANGE:
-                if (sender.tag == Constants.GRID1_TAG) player1Score = (int)param;
-                if (sender.tag == Constants.GRID2_TAG) player2Score = (int)param;
-                break;
             case EVENT_TYPE.GAMEOVER:
                 GameOver();
                 break;
             case EVENT_TYPE.NEW_PIECE:
                 int[] pieceVal = (int[])param;
-                // Debug.Log(string.Format("New Piece {0} {1} {2}", pieceVal[0], pieceVal[1], pieceVal[2]));
-                SpawnNewTile(pieceVal);
+                SpawnNewTiles(pieceVal);
                 break;
             default:
                 break;

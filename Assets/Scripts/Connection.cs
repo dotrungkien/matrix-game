@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 public class Connection : MonoBehaviour
 {
     [HideInInspector]
-    public string userID;
+    public string myID;
 
     List<string> currentGames = new List<string>();
     private Socket socket = null;
@@ -17,11 +17,11 @@ public class Connection : MonoBehaviour
 
     void Start()
     {
-        userID = PlayerPrefs.GetString("userID", "");
-        if (userID == "")
+        myID = PlayerPrefs.GetString("myID", "");
+        if (myID == "")
         {
-            userID = System.Guid.NewGuid().ToString();
-            PlayerPrefs.SetString("userID", userID);
+            myID = System.Guid.NewGuid().ToString();
+            PlayerPrefs.SetString("myID", myID);
         }
         SocketConnect();
     }
@@ -44,7 +44,7 @@ public class Connection : MonoBehaviour
         // socket.OnMessage += onMessageCallback;
 
         Dictionary<string, string> socketArgument = new Dictionary<string, string>();
-        socketArgument["id"] = userID;
+        socketArgument["id"] = myID;
 
         socket.Connect("wss://matrix.heasygame.com/socket", socketArgument);
     }
@@ -113,7 +113,7 @@ public class Connection : MonoBehaviour
         gameChannel = socket.MakeChannel(string.Format("game:{0}", gameID));
         gameChannel.On("game:new_piece", data =>
         {
-            Debug.Log(MessageSerialization.Serialize(data));
+            Debug.Log(string.Format("------on new_piece------ {0}", MessageSerialization.Serialize(data)));
             var piece = data.payload["piece"];
             int[] pieceVal = piece.ToObject<int[]>();
             EventManager.GetInstance().PostNotification(EVENT_TYPE.NEW_PIECE, this, pieceVal);
@@ -133,7 +133,7 @@ public class Connection : MonoBehaviour
                 GridState state = new GridState(
                         player_id, player_nick, point, game_id, grid
                     );
-                GameManager.GetInstance().UpdateGrid(i, state);
+                GameManager.GetInstance().UpdateGrid(player_id, state);
             }
 
             // Debug.Log(MessageSerialization.Serialize(data));
@@ -158,20 +158,12 @@ public class Connection : MonoBehaviour
         });
         gameChannel.On("game:place_piece", data =>
         {
+            Debug.Log(string.Format("------on place_piece----- {0}", MessageSerialization.Serialize(data)));
             var game = data.payload["game"];
-            string[] players = game["players"].ToObject<string[]>();
-            string currentPlayer = "";
-            int i = 0;
-            for (i = 0; i < players.Length; i++)
-            {
-                currentPlayer = players[i];
-                Debug.Log(string.Format("{0} {1}", players[i], game["player_states"][currentPlayer]));
-                if ((string)game["player_states"][currentPlayer] == "ready") break;
-            }
-            if (currentPlayer == "" || i >= players.Length) return;
-            Dictionary<string, int> gridData = game["player_boards"][currentPlayer]["grid"].ToObject<Dictionary<string, int>>();
-            Debug.Log(string.Format("connection, i = " + i));
-            GameManager.GetInstance().UpdateGridData(i, gridData);
+            string sender = (string)data.payload["player_id"];
+            Dictionary<string, int> gridData = game["player_boards"][sender]["grid"].ToObject<Dictionary<string, int>>();
+            var piece = data.payload["piece"];
+            GameManager.GetInstance().UpdateGridData(sender, gridData, piece);
             GameManager.GetInstance().turn = game["turn"].ToObject<int>();
         });
     }
@@ -192,6 +184,6 @@ public class Connection : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        PlayerPrefs.DeleteKey("userID");
+        PlayerPrefs.DeleteKey("myID");
     }
 }
