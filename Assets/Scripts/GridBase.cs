@@ -5,7 +5,6 @@ using Newtonsoft.Json.Linq;
 
 public class GridBase : MonoBehaviour
 {
-
     public float cellSize = 0.5f;
     int[,] grid = new int[9, 9];
 

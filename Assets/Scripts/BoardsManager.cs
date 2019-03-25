@@ -6,11 +6,20 @@ using Newtonsoft.Json.Linq;
 
 public struct GridState
 {
-    public int points;
     public string player_id;
-    public string nick;
-    public Dictionary<string, int> grid;
+    public string player_nick;
+    public int point;
     public string game_id;
+    public Dictionary<string, int> grid;
+
+    public GridState(string _player_id, string _player_nick, int _point, string _game_id, Dictionary<string, int> _grid)
+    {
+        player_id = _player_id;
+        player_nick = _player_id;
+        point = _point;
+        game_id = _game_id;
+        grid = _grid;
+    }
 }
 
 public class BoardsManager : MonoBehaviour
@@ -19,18 +28,21 @@ public class BoardsManager : MonoBehaviour
     public Transform grid1SpawnPos;
     public Transform grid2SpawnPos;
 
-
     Dictionary<string, GridState> boards = new Dictionary<string, GridState>();
 
-    void Start()
+    public void SpawnGrid(int id, GridState state)
     {
-
-    }
-    void SpawnNewGrid(GridState state)
-    {
-        Transform spawnPosition = grid1SpawnPos.childCount == 0 ? grid1SpawnPos : grid2SpawnPos;
-        var gridObj = Instantiate(gridPrefab, spawnPosition.position, Quaternion.identity, spawnPosition);
-        var grid = gridObj.GetComponent<GridBase>();
+        Transform spawnPosition = id == 0 ? grid1SpawnPos : grid2SpawnPos;
+        GridBase grid;
+        if (spawnPosition.childCount > 0)
+        {
+            grid = spawnPosition.GetComponentInChildren<GridBase>();
+        }
+        else
+        {
+            var gridObj = Instantiate(gridPrefab, spawnPosition.position, Quaternion.identity, spawnPosition);
+            grid = gridObj.GetComponent<GridBase>();
+        }
         grid.UpdateState(state);
     }
 }

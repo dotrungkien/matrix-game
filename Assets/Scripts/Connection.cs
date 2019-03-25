@@ -9,7 +9,7 @@ public class Connection : MonoBehaviour
 {
     [HideInInspector]
     public string userID;
-    public GridManager[] grids;
+    public BoardsManager boards;
 
     List<string> currentGames = new List<string>();
     private Socket socket = null;
@@ -117,8 +117,23 @@ public class Connection : MonoBehaviour
         });
         gameChannel.On("game:player_joined", data =>
         {
-            Debug.Log("On Player Joined");
-            Debug.Log(MessageSerialization.Serialize(data));
+            var game = data.payload["game"];
+            string[] players = game["players"].ToObject<string[]>();
+            string[] player_nicks = game["player_nicks"].ToObject<string[]>();
+            for (int i = 0; i < players.Length; i++)
+            {
+                string player_id = players[i];
+                string player_nick = player_nicks[i];
+                int point = game["points"][player_id].ToObject<int>();
+                string game_id = game["id"].ToObject<string>();
+                Dictionary<string, int> grid = game["player_boards"][player_id]["grid"].ToObject<Dictionary<string, int>>();
+                GridState state = new GridState(
+                        player_id, player_nick, point, game_id, grid
+                    );
+                boards.SpawnGrid(i, state);
+            }
+
+            // Debug.Log(MessageSerialization.Serialize(data));
         });
         gameChannel.On("game:started", data =>
         {
