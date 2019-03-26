@@ -71,7 +71,7 @@ public class Connection : MonoBehaviour, IListener
             {
                 if (!(bool)item["locked"]) games.Add((string)item["id"]);
             }
-            listGames.UpdateGames(games);
+            if (listGames.gameObject.activeSelf) listGames.UpdateGames(games);
         });
         var param = new Dictionary<string, object> { };
         lobbyChannel.Join(param)

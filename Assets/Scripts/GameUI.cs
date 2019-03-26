@@ -22,6 +22,7 @@ public class GameUI : MonoBehaviour, IListener
     public GameObject gameOverPanel;
     public Button readyButton;
     public Button restartButton;
+    public Button quitButton;
 
     void Start()
     {
@@ -46,6 +47,7 @@ public class GameUI : MonoBehaviour, IListener
         EventManager.GetInstance().AddListener(EVENT_TYPE.GAMEOVER, this);
         readyButton.onClick.AddListener(Ready);
         restartButton.onClick.AddListener(gameManager.Restart);
+        quitButton.onClick.AddListener(gameManager.Restart);
     }
 
     public string RandomString(int length)

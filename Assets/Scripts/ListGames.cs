@@ -23,7 +23,7 @@ public class ListGames : MonoBehaviour
     {
         foreach (Transform child in contentPanel.transform)
         {
-            GameObject.Destroy(child.gameObject);
+            if (child != null) GameObject.Destroy(child.gameObject);
         }
         for (int i = 0; i < games.Count; i++)
         {
