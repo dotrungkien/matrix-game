@@ -25,6 +25,13 @@ public class GameUI : MonoBehaviour, IListener
 
     void Start()
     {
+        string username = PlayerPrefs.GetString("username", "");
+        if (username == "")
+        {
+            username = RandomString(8);
+            PlayerPrefs.SetString("username", username);
+        }
+
         lobbyPanel.SetActive(true);
         createGameButton.onClick.AddListener(CreateGame);
         createGameButton.gameObject.SetActive(false);
@@ -39,6 +46,14 @@ public class GameUI : MonoBehaviour, IListener
         EventManager.GetInstance().AddListener(EVENT_TYPE.GAMEOVER, this);
         readyButton.onClick.AddListener(Ready);
         restartButton.onClick.AddListener(gameManager.Restart);
+    }
+
+    public string RandomString(int length)
+    {
+        System.Random random = new System.Random();
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        return new string(Enumerable.Repeat(chars, length)
+          .Select(s => s[random.Next(s.Length)]).ToArray());
     }
 
     public void CreateGame()

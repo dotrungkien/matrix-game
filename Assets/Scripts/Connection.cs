@@ -10,12 +10,14 @@ public class Connection : MonoBehaviour, IListener
     [HideInInspector]
     public string myID;
 
+
     public GameManager gameManager;
     public ListGames listGames;
 
     private Socket socket = null;
     private Channel lobbyChannel;
     private Channel gameChannel;
+
 
     void Start()
     {
@@ -25,6 +27,7 @@ public class Connection : MonoBehaviour, IListener
             myID = System.Guid.NewGuid().ToString();
             PlayerPrefs.SetString("myID", myID);
         }
+
         SocketConnect();
         EventManager.GetInstance().AddListener(EVENT_TYPE.PLACE_PIECE, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME, this);
@@ -40,7 +43,10 @@ public class Connection : MonoBehaviour, IListener
         };
         Socket.OnClosedDelegate onCloseCallback = (code, message) => Debug.Log(string.Format("Socket on close. {0} {1}", code, message));
         // Socket.OnMessageDelegate onMessageCallback = (message) => Debug.Log(string.Format("Socket on message. {0}", message));
-        Socket.OnErrorDelegate onErrorCallback = message => Debug.Log("Socket on error.");
+        Socket.OnErrorDelegate onErrorCallback = message =>
+        {
+            Debug.Log("Socket on error.");
+        };
 
         socket.OnOpen += onOpenCallback;
         socket.OnError += onErrorCallback;
