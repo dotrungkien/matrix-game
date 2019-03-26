@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class GameUI : MonoBehaviour, IListener
 {
-    public string gameID;
     public GameManager gameManager;
     public Connection connection;
 

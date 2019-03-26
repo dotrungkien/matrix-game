@@ -5,7 +5,7 @@ using UnityEngine;
 public class ListGames : MonoBehaviour
 {
     public List<string> games = new List<string>();
-    public SimpleObjectPool objectPool;
+    public GameInfo gameInfoPrefab;
     public Transform contentPanel;
 
     void Start()
@@ -24,10 +24,7 @@ public class ListGames : MonoBehaviour
         for (int i = 0; i < games.Count; i++)
         {
             string gameID = games[i];
-            GameObject newGameInfo = objectPool.GetObject();
-            newGameInfo.transform.SetParent(contentPanel);
-
-            GameInfo gameInfo = newGameInfo.GetComponent<GameInfo>();
+            GameInfo gameInfo = Instantiate(gameInfoPrefab, gameInfoPrefab.transform.position, Quaternion.identity, contentPanel);
             gameInfo.Setup(gameID);
         }
     }

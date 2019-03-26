@@ -9,22 +9,22 @@ public class GameInfo : MonoBehaviour
     public Button joinGameButton;
     public Text gameLabel;
 
-    private string _gameID;
+    private string gameID;
 
     void Start()
     {
         joinGameButton.onClick.AddListener(JoinGame);
     }
 
-    public void Setup(string gameID)
+    public void Setup(string _gameID)
     {
-        _gameID = gameID;
+        gameID = _gameID;
         gameLabel.text = _gameID;
     }
 
     public void JoinGame()
     {
-        Debug.Log("join game " + _gameID);
-        EventManager.GetInstance().PostNotification(EVENT_TYPE.JOIN_GAME, this, _gameID);
+        Debug.Log("join game " + gameID);
+        EventManager.GetInstance().PostNotification(EVENT_TYPE.JOIN_GAME, this, gameID);
     }
 }
