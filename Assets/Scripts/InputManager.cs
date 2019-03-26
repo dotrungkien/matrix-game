@@ -43,19 +43,26 @@ public class InputManager : MonoBehaviour
         }
         else
         {
-            var layerMask = 1 << 0;
-            RaycastHit2D[] touches = Physics2D.RaycastAll(inputPosition, inputPosition, 0.5f, layerMask);
-            if (touches.Length > 0)
-            {
-                var hit = touches[0];
-                if (hit.transform != null && hit.transform.tag == Constants.MOVABLE_TAG)
-                {
-                    draggingItem = true;
-                    draggedObject = hit.transform.gameObject;
-                    touchOffset = (Vector2)hit.transform.position - inputPosition;
-                    hit.transform.GetComponent<Tile>().PickUp();
-                }
-            }
+            // var layerMask = 1 << 0;
+            // RaycastHit2D[] touches = Physics2D.RaycastAll(inputPosition, inputPosition, 0.5f, layerMask);
+            // if (touches.Length > 0)
+            // {
+            //     var hit = touches[0];
+            //     if (hit.transform != null && hit.transform.tag == Constants.MOVABLE_TAG)
+            //     {
+            //         draggingItem = true;
+            //         draggedObject = hit.transform.gameObject;
+            //         draggedObject = GameObject.FindGameObjectWithTag(Constants.MOVABLE_TAG);
+            //         touchOffset = (Vector2)hit.transform.position - inputPosition;
+            //         hit.transform.GetComponent<Tile>().PickUp();
+            //     }
+            // }
+
+            draggedObject = GameObject.FindGameObjectWithTag(Constants.MOVABLE_TAG);
+            if (draggedObject == null) return;
+            draggingItem = true;
+            touchOffset = (Vector2)draggedObject.transform.position - inputPosition;
+            draggedObject.transform.GetComponent<Tile>().PickUp();
         }
     }
 

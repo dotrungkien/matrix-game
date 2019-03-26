@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 public class GridBase : MonoBehaviour
 {
     public Tile renderTile;
-    public float cellSize = 0.5f;
+    public float cellSize = 0.4f;
     int[,] grid = new int[9, 9];
     private int dim = 9;
 
@@ -29,8 +29,8 @@ public class GridBase : MonoBehaviour
     public Vector3 GridToPos(int[] cell)
     {
         Vector3 gridPos = transform.position;
-        float x = cell[0] * cellSize - 2 + gridPos.x;
-        float y = cell[1] * cellSize - 2 + gridPos.y;
+        float x = cell[0] * cellSize - cellSize * 4 + gridPos.x;
+        float y = cell[1] * cellSize - cellSize * 4 + gridPos.y;
         return new Vector3(x, y, 0);
     }
 

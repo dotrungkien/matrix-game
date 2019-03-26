@@ -38,7 +38,7 @@ public class Tile : MonoBehaviour
     public void PickUp()
     {
         if (transform.tag != Constants.MOVABLE_TAG) return;
-        transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
+        transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
         render.sortingOrder = 2;
         top.sortingOrder = 3;
         mid.sortingOrder = 3;
@@ -47,7 +47,7 @@ public class Tile : MonoBehaviour
 
     public void Drop()
     {
-        transform.localScale = new Vector3(0.5f, 0.5f, 1);
+        transform.localScale = new Vector3(1f, 1f, 1f);
         render.sortingOrder = 0;
         top.sortingOrder = 1;
         mid.sortingOrder = 1;
@@ -90,7 +90,6 @@ public class Tile : MonoBehaviour
             transform.parent = currentCell;
             StartCoroutine(SlotIntoPlace(transform.position, newPosition));
         }
-        transform.tag = Constants.UNTAGGED;
     }
 
 
@@ -127,14 +126,12 @@ public class Tile : MonoBehaviour
         SoundManager.GetInstance().MakeTileSound();
         transform.position = endingPos;
 
-        // GridManager gridManager = transform.parent.parent.parent.GetComponent<GridManager>();
         GridBase gridBase = transform.parent.parent.parent.GetComponent<GridBase>();
         int[] cell = gridBase.PosToGrid(endingPos);
         gridBase.UpdateGridVal(cell[0], cell[1], topVal, midVal, botVal);
         cell[1] = (8 - cell[1]) / 3;
         EventManager.GetInstance().PostNotification(EVENT_TYPE.PLACE_PIECE, this, cell);
-        // Debug.Log("Place on x= " + cell[0] + ", y= " + cell[1]);
-        // GameManager.GetInstance().SpawnNewTile();
+        transform.tag = Constants.UNTAGGED;
 
     }
 }
