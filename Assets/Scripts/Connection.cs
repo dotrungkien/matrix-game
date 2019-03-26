@@ -13,7 +13,6 @@ public class Connection : MonoBehaviour, IListener
     public GameManager gameManager;
     public ListGames listGames;
 
-    List<string> currentGames = new List<string>();
     private Socket socket = null;
     private Channel lobbyChannel;
     private Channel gameChannel;
@@ -28,6 +27,7 @@ public class Connection : MonoBehaviour, IListener
         }
         SocketConnect();
         EventManager.GetInstance().AddListener(EVENT_TYPE.PLACE_PIECE, this);
+        EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME, this);
     }
 
     void SocketConnect()
@@ -63,9 +63,8 @@ public class Connection : MonoBehaviour, IListener
             List<string> games = new List<string>();
             foreach (JToken item in gamesData)
             {
-                games.Add((string)item["id"]);
+                if (!(bool)item["locked"]) games.Add((string)item["id"]);
             }
-            Debug.Log(string.Join(" ", games));
             listGames.UpdateGames(games);
         });
         var param = new Dictionary<string, object> { };
@@ -94,7 +93,6 @@ public class Connection : MonoBehaviour, IListener
         .Receive(Reply.Status.Ok, reply =>
         {
             gameID = reply.response.GetValue("game_id").ToString();
-            currentGames.Add(gameID);
             JoinGame(gameID, password);
         })
         .Receive(Reply.Status.Error, reply => Debug.Log("Create new game failed."));
@@ -216,6 +214,10 @@ public class Connection : MonoBehaviour, IListener
                 };
 
                 gameChannel.Push("game:place_piece", pieceCoord);
+                break;
+            case EVENT_TYPE.JOIN_GAME:
+                string gameID = (string)param;
+                JoinGame(gameID);
                 break;
             default:
                 break;

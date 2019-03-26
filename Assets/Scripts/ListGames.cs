@@ -21,6 +21,10 @@ public class ListGames : MonoBehaviour
 
     public void UpdateListGames()
     {
+        foreach (Transform child in contentPanel.transform)
+        {
+            GameObject.Destroy(child.gameObject);
+        }
         for (int i = 0; i < games.Count; i++)
         {
             string gameID = games[i];

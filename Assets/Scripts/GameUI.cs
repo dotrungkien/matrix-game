@@ -35,6 +35,7 @@ public class GameUI : MonoBehaviour, IListener
         gameOverPanel.SetActive(false);
         EventManager.GetInstance().AddListener(EVENT_TYPE.SOCKET_READY, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.SCORE_CHANGE, this);
+        EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.GAMEOVER, this);
         readyButton.onClick.AddListener(Ready);
         restartButton.onClick.AddListener(gameManager.Restart);
@@ -67,6 +68,10 @@ public class GameUI : MonoBehaviour, IListener
         {
             case EVENT_TYPE.SOCKET_READY:
                 createGameButton.gameObject.SetActive(true);
+                break;
+            case EVENT_TYPE.JOIN_GAME:
+                lobbyPanel.SetActive(false);
+                gamePanel.SetActive(true);
                 break;
             case EVENT_TYPE.SCORE_CHANGE:
                 KeyValuePair<string, string> playerScore = (KeyValuePair<string, string>)param;

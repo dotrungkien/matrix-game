@@ -24,7 +24,9 @@ public class GameInfo : MonoBehaviour
 
     public void JoinGame()
     {
-        Debug.Log("join game " + gameID);
+        SoundManager.GetInstance().MakeClickSound();
         EventManager.GetInstance().PostNotification(EVENT_TYPE.JOIN_GAME, this, gameID);
+        Debug.Log(string.Format("Join game {0}", gameID));
+        joinGameButton.onClick.RemoveListener(JoinGame);
     }
 }
