@@ -32,7 +32,7 @@ public class Tile : MonoBehaviour
         botVal = val[2];
         bot.sprite = renders[botVal - 7];
         render = GetComponent<SpriteRenderer>();
-        render.color = (transform.tag == Constants.MOVABLE_TAG) ? new Color(0f, 0.6f, 0f) : new Color(0f, 0f, 0.6f);
+        render.color = (transform.tag == Constants.MOVABLE_TAG) ? new Color(0.39f, 0.78f, 0.47f) : new Color(0.30f, 0.59f, 0.83f);
     }
 
     public void PickUp()

@@ -195,8 +195,63 @@ public class GridBase : MonoBehaviour
         lineRenderer.endWidth = 0.03f;
         lineRenderer.positionCount = 2;
         lineRenderer.useWorldSpace = true;
-        lineRenderer.SetPosition(0, from);
-        lineRenderer.SetPosition(1, to);
+        Vector3 newFrom = from;
+        Vector3 newTo = to;
+
+        float extra = cellSize / 2.0f;
+
+        if (from.x == to.x)
+        {
+            if (from.y < to.y)
+            {
+                newFrom = new Vector3(from.x, from.y - extra, from.z);
+                newTo = new Vector3(to.x, to.y + extra, to.z);
+            }
+            else
+            {
+                newFrom = new Vector3(from.x, from.y + extra, from.z);
+                newTo = new Vector3(to.x, to.y - extra, to.z);
+            }
+        }
+        else if (from.y == to.y)
+        {
+            if (from.x < to.x)
+            {
+                newFrom = new Vector3(from.x - extra, from.y, from.z);
+                newTo = new Vector3(to.x + extra, to.y, to.z);
+            }
+            else
+            {
+                newFrom = new Vector3(from.x + extra, from.y, from.z);
+                newTo = new Vector3(to.x - extra, to.y, to.z);
+            }
+        }
+        else
+        {
+            if (from.x < to.x && from.y > to.y)
+            {
+                newFrom = new Vector3(from.x - extra, from.y + extra, from.z);
+                newTo = new Vector3(to.x + extra, to.y - extra, to.z);
+            }
+            else if (from.x < to.x && from.y < to.y)
+            {
+                newFrom = new Vector3(from.x - extra, from.y - extra, from.z);
+                newTo = new Vector3(to.x + extra, to.y + extra, to.z);
+            }
+            else if (from.x > to.x && from.y > to.y)
+            {
+                newFrom = new Vector3(from.x + extra, from.y + extra, from.z);
+                newTo = new Vector3(to.x - extra, to.y - extra, to.z);
+            }
+            else if (from.x > to.x && from.y < to.y)
+            {
+                newFrom = new Vector3(from.x + extra, from.y - extra, from.z);
+                newTo = new Vector3(to.x - extra, to.y + extra, to.z);
+            }
+        }
+
+        lineRenderer.SetPosition(0, newFrom);
+        lineRenderer.SetPosition(1, newTo);
         lineRenderer.sortingLayerName = "Tile";
         lineRenderer.sortingOrder = 5;
     }
