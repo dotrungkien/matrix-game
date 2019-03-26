@@ -20,8 +20,8 @@ public class GridBase : MonoBehaviour
     public int[] PosToGrid(Vector2 pos)
     {
         Vector3 gridPos = transform.position;
-        int x = (int)Mathf.Floor((pos.x - gridPos.x + 2) / cellSize);
-        int y = (int)Mathf.Floor((pos.y - gridPos.y + 2) / cellSize);
+        int x = Mathf.RoundToInt((pos.x - gridPos.x) / cellSize) + 4;
+        int y = Mathf.RoundToInt((pos.y - gridPos.y) / cellSize) + 4;
         int[] res = new int[2] { x, y };
         return res;
     }
@@ -198,7 +198,7 @@ public class GridBase : MonoBehaviour
         Vector3 newFrom = from;
         Vector3 newTo = to;
 
-        float extra = cellSize / 2.0f;
+        float extra = cellSize * 0.5f;
 
         if (from.x == to.x)
         {

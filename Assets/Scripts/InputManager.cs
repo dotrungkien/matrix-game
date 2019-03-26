@@ -19,8 +19,7 @@ public class InputManager : MonoBehaviour
         }
         else
         {
-            if (draggingItem)
-                DropItem();
+            if (draggingItem) DropItem();
         }
     }
 
