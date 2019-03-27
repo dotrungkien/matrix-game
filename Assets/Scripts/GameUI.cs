@@ -9,10 +9,14 @@ public class GameUI : MonoBehaviour, IListener
     public GameManager gameManager;
     public Connection connection;
 
-    // lobby panel
-    public GameObject lobbyPanel;
+    // public set usetname panel
+    public GameObject setUsernamePanel;
     public InputField usernameInput;
     public Button setUsername;
+
+    // lobby panel
+    public Text usernameText;
+    public GameObject lobbyPanel;
     public Button createGameButton;
 
     //game panel
@@ -29,15 +33,17 @@ public class GameUI : MonoBehaviour, IListener
         string username = PlayerPrefs.GetString("username", "");
         if (username == "")
         {
-            username = RandomString(8);
-            PlayerPrefs.SetString("username", username);
+            setUsernamePanel.SetActive(true);
+            setUsername.onClick.AddListener(SetName);
         }
-
+        else
+        {
+            setUsernamePanel.SetActive(false);
+            usernameText.text = username;
+        }
         lobbyPanel.SetActive(true);
         createGameButton.onClick.AddListener(CreateGame);
         createGameButton.gameObject.SetActive(false);
-        setUsername.onClick.AddListener(SetName);
-        usernameInput.text = PlayerPrefs.GetString("username", "");
 
         gamePanel.SetActive(false);
         gameOverPanel.SetActive(false);
