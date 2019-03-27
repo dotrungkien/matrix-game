@@ -51,6 +51,7 @@ public class GameUI : MonoBehaviour, IListener
         readyButton.onClick.AddListener(Ready);
         createGameButton.gameObject.SetActive(false);
 
+        readyPanel.SetActive(true);
         lobbyPanel.SetActive(true);
         gamePanel.SetActive(false);
         gameOverPanel.SetActive(false);
