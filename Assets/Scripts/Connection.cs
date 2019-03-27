@@ -64,7 +64,7 @@ public class Connection : MonoBehaviour, IListener
         lobbyChannel = socket.MakeChannel("lobby");
         lobbyChannel.On("update_games", data =>
         {
-            Debug.Log(string.Format("------on update_games------ {0}", MessageSerialization.Serialize(data)));
+            // Debug.Log(string.Format("------on update_games------ {0}", MessageSerialization.Serialize(data)));
             var gamesData = data.payload["games"];
             List<string> games = new List<string>();
             foreach (JToken item in gamesData)
@@ -136,13 +136,13 @@ public class Connection : MonoBehaviour, IListener
             var game = data.payload["game"];
             string[] players = game["players"].ToObject<string[]>();
             string[] player_nicks = game["player_nicks"].ToObject<string[]>();
+            var playerScores = new Dictionary<int, KeyValuePair<string, string>>();
             for (int i = 0; i < players.Length; i++)
             {
                 string player_id = players[i];
                 string player_nick = player_nicks[i];
                 int point = game["points"][player_id].ToObject<int>();
-                var param = new KeyValuePair<string, string>(player_nick, (string)game["points"][player_id]);
-                EventManager.GetInstance().PostNotification(EVENT_TYPE.SCORE_CHANGE, null, param);
+                playerScores[i] = new KeyValuePair<string, string>(player_nick, (string)game["points"][player_id]);
                 string game_id = game["id"].ToObject<string>();
                 Dictionary<string, int> grid = game["player_boards"][player_id]["grid"].ToObject<Dictionary<string, int>>();
                 GridState state = new GridState(
@@ -150,6 +150,7 @@ public class Connection : MonoBehaviour, IListener
                     );
                 gameManager.UpdateGrid(player_id, state);
             }
+            EventManager.GetInstance().PostNotification(EVENT_TYPE.SCORE_CHANGE, null, playerScores);
         });
         gameChannel.On("game:started", data =>
         {
@@ -177,10 +178,13 @@ public class Connection : MonoBehaviour, IListener
             // Debug.Log(string.Format("------on place_piece----- {0}", MessageSerialization.Serialize(data)));
             var game = data.payload["game"];
             string sender = (string)data.payload["player_id"];
+            string[] players = game["players"].ToObject<string[]>();
+            int index = Array.IndexOf(players, sender);
             string player_nick = (string)game["player_boards"][sender]["nick"];
             Dictionary<string, int> gridData = game["player_boards"][sender]["grid"].ToObject<Dictionary<string, int>>();
             string point = (string)game["points"][sender];
-            var param = new KeyValuePair<string, string>(player_nick, point);
+            var playerScore = new KeyValuePair<string, string>(player_nick, point);
+            var param = new Dictionary<int, KeyValuePair<string, string>> { { index, playerScore } };
             EventManager.GetInstance().PostNotification(EVENT_TYPE.SCORE_CHANGE, null, param);
             var piece = data.payload["piece"];
             gameManager.UpdateGridData(sender, gridData, piece);

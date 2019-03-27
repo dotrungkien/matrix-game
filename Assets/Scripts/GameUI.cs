@@ -29,6 +29,8 @@ public class GameUI : MonoBehaviour, IListener
     public Button quitButton;
     public Button readyButton;
 
+    public PlayerScore[] players;
+
     void Start()
     {
         setUsername.onClick.AddListener(SetName);
@@ -105,16 +107,14 @@ public class GameUI : MonoBehaviour, IListener
                 gamePanel.SetActive(true);
                 break;
             case EVENT_TYPE.SCORE_CHANGE:
-                KeyValuePair<string, string> playerScore = (KeyValuePair<string, string>)param;
-                if (playerScore.Key == PlayerPrefs.GetString("username", ""))
+                var playerScores = (Dictionary<int, KeyValuePair<string, string>>)param;
+                foreach (KeyValuePair<int, KeyValuePair<string, string>> item in playerScores)
                 {
-                    myScore.text = string.Format("{0}: {1}", playerScore.Key, playerScore.Value);
+                    int index = item.Key;
+                    KeyValuePair<string, string> playerScore = item.Value;
+                    if (!players[index].gameObject.activeSelf) players[index].gameObject.SetActive(true);
+                    players[index].UpdatePlayer(playerScore.Key, playerScore.Value);
                 }
-                else
-                {
-                    otherScore.text = string.Format("{0}: {1}", playerScore.Key, playerScore.Value);
-                }
-
                 break;
             case EVENT_TYPE.GAMEOVER:
                 gameOverPanel.SetActive(true);
