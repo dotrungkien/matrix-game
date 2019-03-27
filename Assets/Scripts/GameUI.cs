@@ -24,36 +24,38 @@ public class GameUI : MonoBehaviour, IListener
     public Text myScore;
     public Text otherScore;
     public GameObject gameOverPanel;
-    public Button readyButton;
+    public GameObject readyPanel;
     public Button restartButton;
     public Button quitButton;
+    public Button readyButton;
 
     void Start()
     {
+        setUsername.onClick.AddListener(SetName);
+        restartButton.onClick.AddListener(gameManager.Restart);
+        quitButton.onClick.AddListener(gameManager.Restart);
         string username = PlayerPrefs.GetString("username", "");
         if (username == "")
         {
             setUsernamePanel.SetActive(true);
-            setUsername.onClick.AddListener(SetName);
         }
         else
         {
             setUsernamePanel.SetActive(false);
-            usernameText.text = username;
         }
-        lobbyPanel.SetActive(true);
+
+        usernameText.text = username;
         createGameButton.onClick.AddListener(CreateGame);
+        readyButton.onClick.AddListener(Ready);
         createGameButton.gameObject.SetActive(false);
 
+        lobbyPanel.SetActive(true);
         gamePanel.SetActive(false);
         gameOverPanel.SetActive(false);
         EventManager.GetInstance().AddListener(EVENT_TYPE.SOCKET_READY, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.SCORE_CHANGE, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.GAMEOVER, this);
-        readyButton.onClick.AddListener(Ready);
-        restartButton.onClick.AddListener(gameManager.Restart);
-        quitButton.onClick.AddListener(gameManager.Restart);
     }
 
     public string RandomString(int length)
@@ -75,14 +77,20 @@ public class GameUI : MonoBehaviour, IListener
     public void Ready()
     {
         SoundManager.GetInstance().MakeClickSound();
+        readyPanel.SetActive(false);
         readyButton.gameObject.SetActive(false);
         connection.SetReady();
     }
 
     void SetName()
     {
+        string username = usernameInput.text;
+        if (username == "") return;
         SoundManager.GetInstance().MakeClickSound();
-        PlayerPrefs.SetString("username", usernameInput.text);
+        PlayerPrefs.SetString("username", username);
+        usernameText.text = username;
+        setUsernamePanel.SetActive(false);
+        lobbyPanel.SetActive(true);
     }
 
     public void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
