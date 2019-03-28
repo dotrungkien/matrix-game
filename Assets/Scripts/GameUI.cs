@@ -114,13 +114,18 @@ public class GameUI : MonoBehaviour, IListener
                     if (!players[index].gameObject.activeSelf) players[index].gameObject.SetActive(true);
                     string player_nick = playerScore.Key;
                     players[index].UpdatePlayer(playerScore.Key, playerScore.Value);
-                    if (!players[index].isListening && index != 0)
+                    if (!players[index].isListening)
                     {
-                        Button activeSelf = players[index].GetComponent<Button>();
-                        activeSelf.onClick.AddListener(() =>
+                        players[index].GetComponent<Image>().color = gameManager.colors[index];
+                        if (index != 0)
                         {
-                            gameManager.ActiveGrid(player_nick);
-                        });
+                            Button activeSelf = players[index].GetComponent<Button>();
+                            activeSelf.onClick.AddListener(() =>
+                            {
+                                gameManager.ActiveGrid(player_nick);
+                            });
+                        }
+
                         players[index].isListening = true;
                     }
                 }

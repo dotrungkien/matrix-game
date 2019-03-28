@@ -21,6 +21,7 @@ public class Tile : MonoBehaviour
         startingPosition = transform.position;
         touchingTiles = new List<Transform>();
         myParent = transform.parent;
+        render = GetComponent<SpriteRenderer>();
     }
 
     public void SetVal(int[] val)
@@ -31,8 +32,6 @@ public class Tile : MonoBehaviour
         mid.sprite = renders[midVal];
         botVal = val[2];
         bot.sprite = renders[botVal];
-        render = GetComponent<SpriteRenderer>();
-        render.color = (transform.tag == Constants.MOVABLE_TAG) ? new Color(0.39f, 0.78f, 0.47f) : new Color(0.30f, 0.59f, 0.83f);
     }
 
     public void PickUp()
@@ -88,6 +87,7 @@ public class Tile : MonoBehaviour
         else
         {
             transform.parent = currentCell;
+            render.color = currentCell.parent.parent.GetComponent<SpriteRenderer>().color;
             StartCoroutine(SlotIntoPlace(transform.position, newPosition));
         }
     }

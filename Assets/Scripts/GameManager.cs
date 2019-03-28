@@ -24,20 +24,20 @@ public struct GridState
 
 public class GameManager : MonoBehaviour, IListener
 {
+
+    public Color[] colors;
     public Tile tilePrefab;
     public Transform tileSpawnPos;
 
     public GridBase gridPrefab;
     public Transform grid1SpawnPos;
     public Transform grid2SpawnPos;
-    public Transform inactivePos;
 
 
     public bool isGameOver = false;
 
     private string myID;
     public Dictionary<string, GridBase> grids = new Dictionary<string, GridBase>();
-
 
     void Start()
     {
@@ -52,8 +52,7 @@ public class GameManager : MonoBehaviour, IListener
         bool isMe = (player_id == myID);
         Transform spawnPosition;
         if (isMe) spawnPosition = grid1SpawnPos;
-        else if (grid2SpawnPos.childCount == 0) spawnPosition = grid2SpawnPos;
-        else spawnPosition = inactivePos;
+        else spawnPosition = grid2SpawnPos;
 
         GameObject target = GameObject.Find(state.player_nick);
         if (target == null)
@@ -61,6 +60,7 @@ public class GameManager : MonoBehaviour, IListener
             GridBase grid = Instantiate(gridPrefab, spawnPosition.position, Quaternion.identity, spawnPosition);
             grid.gameObject.name = state.player_nick;
             if (isMe) grid.transform.tag = Constants.PLACEABLE_TAG;
+            grid.GetComponent<SpriteRenderer>().color = colors[grids.Count];
             grids[player_id] = grid;
         }
         grids[player_id].UpdateState(state);
@@ -73,18 +73,14 @@ public class GameManager : MonoBehaviour, IListener
             string gridName = item.Value.name;
             if (gridName == player_nick)
             {
-                Transform activeGrid = item.Value.transform;
-                activeGrid.parent = grid2SpawnPos;
-                activeGrid.localPosition = Vector3.zero;
+                item.Value.gameObject.SetActive(true);
             }
             else
             {
                 string username = PlayerPrefs.GetString("username", "");
                 if (gridName != username)
                 {
-                    Transform inactiveGrid = item.Value.transform;
-                    inactiveGrid.parent = inactivePos;
-                    inactiveGrid.localPosition = Vector3.zero;
+                    item.Value.gameObject.SetActive(false);
                 }
             }
         }
@@ -103,6 +99,7 @@ public class GameManager : MonoBehaviour, IListener
     {
         Tile tile = Instantiate(tilePrefab, tileSpawnPos.position, Quaternion.identity, tileSpawnPos);
         tile.transform.tag = Constants.MOVABLE_TAG;
+        tile.GetComponent<SpriteRenderer>().color = colors[0];
         tile.SetVal(piece);
     }
 
