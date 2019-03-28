@@ -48,10 +48,10 @@ public class Tile : MonoBehaviour
     public void Drop()
     {
         transform.localScale = new Vector3(1f, 1f, 1f);
-        render.sortingOrder = 0;
-        top.sortingOrder = 1;
-        mid.sortingOrder = 1;
-        bot.sortingOrder = 1;
+        render.sortingOrder = -1;
+        top.sortingOrder = 0;
+        mid.sortingOrder = 0;
+        bot.sortingOrder = 0;
         Vector2 newPosition;
         if (touchingTiles.Count == 0)
         {

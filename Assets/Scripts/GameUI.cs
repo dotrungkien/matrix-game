@@ -50,13 +50,6 @@ public class GameUI : MonoBehaviour, IListener
         readyButton.onClick.AddListener(Ready);
         openCreateGame.gameObject.SetActive(false);
 
-        for (int i = 0; i < players.Length; i++)
-        {
-            int j = i;
-            Button activeSelf = players[j].GetComponent<Button>();
-            activeSelf.onClick.AddListener(() => gameManager.ActiveGrid(players[j].pName));
-        }
-
         readyPanel.SetActive(true);
         lobbyPanel.SetActive(true);
         gamePanel.SetActive(false);
@@ -119,7 +112,17 @@ public class GameUI : MonoBehaviour, IListener
                     int index = item.Key;
                     KeyValuePair<string, string> playerScore = item.Value;
                     if (!players[index].gameObject.activeSelf) players[index].gameObject.SetActive(true);
+                    string player_nick = playerScore.Key;
                     players[index].UpdatePlayer(playerScore.Key, playerScore.Value);
+                    if (!players[index].isListening && index != 0)
+                    {
+                        Button activeSelf = players[index].GetComponent<Button>();
+                        activeSelf.onClick.AddListener(() =>
+                        {
+                            gameManager.ActiveGrid(player_nick);
+                        });
+                        players[index].isListening = true;
+                    }
                 }
                 break;
             case EVENT_TYPE.GAMEOVER:

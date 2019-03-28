@@ -133,6 +133,7 @@ public class Connection : MonoBehaviour, IListener
         });
         gameChannel.On("game:player_joined", data =>
         {
+            // Debug.Log(string.Format("------on player_joined------ {0}", MessageSerialization.Serialize(data)));
             var game = data.payload["game"];
             string[] players = game["players"].ToObject<string[]>();
             string[] player_nicks = game["player_nicks"].ToObject<string[]>();

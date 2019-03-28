@@ -15,7 +15,7 @@ public struct GridState
     public GridState(string _player_id, string _player_nick, int _point, string _game_id, Dictionary<string, int> _grid)
     {
         player_id = _player_id;
-        player_nick = _player_id;
+        player_nick = _player_nick;
         point = _point;
         game_id = _game_id;
         grid = _grid;
@@ -30,9 +30,10 @@ public class GameManager : MonoBehaviour, IListener
     public GridBase gridPrefab;
     public Transform grid1SpawnPos;
     public Transform grid2SpawnPos;
+    public Transform inactivePos;
+
 
     public bool isGameOver = false;
-    List<GameObject> gridObjs = new List<GameObject>();
 
     private string myID;
     public Dictionary<string, GridBase> grids = new Dictionary<string, GridBase>();
@@ -49,31 +50,42 @@ public class GameManager : MonoBehaviour, IListener
     public void UpdateGrid(string player_id, GridState state)
     {
         bool isMe = (player_id == myID);
-        Transform spawnPosition = isMe ? grid1SpawnPos : grid2SpawnPos;
-        GameObject target = GameObject.Find(player_id);
+        Transform spawnPosition;
+        if (isMe) spawnPosition = grid1SpawnPos;
+        else if (grid2SpawnPos.childCount == 0) spawnPosition = grid2SpawnPos;
+        else spawnPosition = inactivePos;
+
+        GameObject target = GameObject.Find(state.player_nick);
         if (target == null)
         {
             GridBase grid = Instantiate(gridPrefab, spawnPosition.position, Quaternion.identity, spawnPosition);
-            grid.gameObject.name = player_id;
+            grid.gameObject.name = state.player_nick;
             if (isMe) grid.transform.tag = Constants.PLACEABLE_TAG;
             grids[player_id] = grid;
-            gridObjs.Add(grid.gameObject);
         }
         grids[player_id].UpdateState(state);
     }
 
-    public void ActiveGrid(string player_id)
+    public void ActiveGrid(string player_nick)
     {
         foreach (KeyValuePair<string, GridBase> item in grids)
         {
-            string key = item.Key;
-            if (key == player_id)
+            string gridName = item.Value.name;
+            if (gridName == player_nick)
             {
-                item.Value.transform.GetComponent<SpriteRenderer>().sortingOrder = -1;
+                Transform activeGrid = item.Value.transform;
+                activeGrid.parent = grid2SpawnPos;
+                activeGrid.position = Vector3.zero;
             }
             else
             {
-                if (key != myID) item.Value.transform.GetComponent<SpriteRenderer>().sortingOrder = -5;
+                string username = PlayerPrefs.GetString("username", "");
+                if (gridName != username)
+                {
+                    Transform inactiveGrid = item.Value.transform;
+                    inactiveGrid.parent = inactivePos;
+                    inactiveGrid.position = Vector3.zero;
+                }
             }
         }
     }
