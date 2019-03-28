@@ -84,7 +84,7 @@ public class Connection : MonoBehaviour, IListener
             .Receive(Reply.Status.Timeout, reply => Debug.Log("Time out"));
     }
 
-    public void CreateNewGame(string max_player = "2", string mode = "easy", string time_limit = "0", string password = "")
+    public void CreateNewGame(string mode = "easy", string max_player = "2", string time_limit = "0", string password = "")
     {
         string gameID = "";
         var newGame = new Dictionary<string, object>

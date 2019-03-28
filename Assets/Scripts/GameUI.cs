@@ -50,6 +50,13 @@ public class GameUI : MonoBehaviour, IListener
         readyButton.onClick.AddListener(Ready);
         openCreateGame.gameObject.SetActive(false);
 
+        for (int i = 0; i < players.Length; i++)
+        {
+            int j = i;
+            Button activeSelf = players[j].GetComponent<Button>();
+            activeSelf.onClick.AddListener(() => gameManager.ActiveGrid(players[j].pName));
+        }
+
         readyPanel.SetActive(true);
         lobbyPanel.SetActive(true);
         gamePanel.SetActive(false);
@@ -85,9 +92,9 @@ public class GameUI : MonoBehaviour, IListener
 
     void SetName()
     {
+        SoundManager.GetInstance().MakeClickSound();
         string username = usernameInput.text;
         if (username == "") return;
-        SoundManager.GetInstance().MakeClickSound();
         PlayerPrefs.SetString("username", username);
         usernameText.text = username;
         setUsernamePanel.SetActive(false);

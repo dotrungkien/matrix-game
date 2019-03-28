@@ -32,9 +32,11 @@ public class GameManager : MonoBehaviour, IListener
     public Transform grid2SpawnPos;
 
     public bool isGameOver = false;
+    List<GameObject> gridObjs = new List<GameObject>();
 
     private string myID;
-    private Dictionary<string, GridBase> grids = new Dictionary<string, GridBase>();
+    public Dictionary<string, GridBase> grids = new Dictionary<string, GridBase>();
+
 
     void Start()
     {
@@ -46,14 +48,34 @@ public class GameManager : MonoBehaviour, IListener
 
     public void UpdateGrid(string player_id, GridState state)
     {
-        Transform spawnPosition = player_id == myID ? grid1SpawnPos : grid2SpawnPos;
-        if (spawnPosition.childCount == 0)
+        bool isMe = (player_id == myID);
+        Transform spawnPosition = isMe ? grid1SpawnPos : grid2SpawnPos;
+        GameObject target = GameObject.Find(player_id);
+        if (target == null)
         {
             GridBase grid = Instantiate(gridPrefab, spawnPosition.position, Quaternion.identity, spawnPosition);
-            if (player_id == myID) grid.transform.tag = Constants.PLACEABLE_TAG;
+            grid.gameObject.name = player_id;
+            if (isMe) grid.transform.tag = Constants.PLACEABLE_TAG;
             grids[player_id] = grid;
+            gridObjs.Add(grid.gameObject);
         }
         grids[player_id].UpdateState(state);
+    }
+
+    public void ActiveGrid(string player_id)
+    {
+        foreach (KeyValuePair<string, GridBase> item in grids)
+        {
+            string key = item.Key;
+            if (key == player_id)
+            {
+                item.Value.transform.GetComponent<SpriteRenderer>().sortingOrder = -1;
+            }
+            else
+            {
+                if (key != myID) item.Value.transform.GetComponent<SpriteRenderer>().sortingOrder = -5;
+            }
+        }
     }
 
     public void UpdateGridData(string player_id, Dictionary<string, int> gridData, JToken piece)

@@ -9,6 +9,7 @@ public class CreateGame : MonoBehaviour
 {
     public GameObject lobbyPanel;
     public GameObject gamePanel;
+    public GameObject createGamePanel;
     public Connection connection;
     public Button[] modeButtons;
     public Button[] maxPlayerButtons;
@@ -18,9 +19,9 @@ public class CreateGame : MonoBehaviour
     public Button close;
     public InputField passwordInput;
 
-    private string mode;
-    private string maxPlayers;
-    private string timeLimit;
+    private string mode = "easy";
+    private string maxPlayers = "2";
+    private string timeLimit = "0";
 
     private Color activeColor = new Color(1f, 0.5f, 0);
     private Color inactiveColor = Color.white;
@@ -44,11 +45,11 @@ public class CreateGame : MonoBehaviour
 
     public void Close()
     {
-        gameObject.SetActive(false);
+        createGamePanel.SetActive(false);
     }
     public void CreateAndStart()
     {
-        connection.CreateNewGame(maxPlayers, mode, timeLimit, passwordInput.text);
+        connection.CreateNewGame(mode, maxPlayers, timeLimit, passwordInput.text);
         lobbyPanel.SetActive(false);
         gamePanel.SetActive(true);
     }
