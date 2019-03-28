@@ -32,6 +32,11 @@ public class Connection : MonoBehaviour, IListener
         EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME, this);
     }
 
+    public void SocketDisconnect()
+    {
+        socket.Disconnect();
+    }
+
     void SocketConnect()
     {
         socket = new Socket(new BestHTTPWebsocketFactory());
@@ -63,13 +68,13 @@ public class Connection : MonoBehaviour, IListener
         lobbyChannel = socket.MakeChannel("lobby");
         lobbyChannel.On("update_games", data =>
         {
-            // Debug.Log(string.Format("------on update_games------ {0}", MessageSerialization.Serialize(data)));
-            var gamesData = data.payload["games"];
-            List<string> games = new List<string>();
-            foreach (JToken item in gamesData)
-            {
-                if (!(bool)item["locked"]) games.Add((string)item["id"]);
-            }
+            Debug.Log(string.Format("------on update_games------ {0}", MessageSerialization.Serialize(data)));
+            var games = data.payload["games"];
+            // List<string> games = new List<string>();
+            // foreach (JToken item in gamesData)
+            // {
+            //     if (!(bool)item["locked"]) games.Add((string)item["id"]);
+            // }
             if (listGames.gameObject.activeSelf) listGames.UpdateGames(games);
         });
         var param = new Dictionary<string, object> { };
@@ -112,9 +117,18 @@ public class Connection : MonoBehaviour, IListener
             {"nick", username},
             {"password", password}
         };
+        Debug.Log(string.Format("JOining game {0} {1} {2}", gameID, username, password));
         gameChannel.Join(param)
-            .Receive(Reply.Status.Ok, reply => Debug.Log(string.Format("Join game {0} ok.", gameID)))
-            .Receive(Reply.Status.Error, reply => Debug.Log(string.Format("Join game {0} failed.", gameID)))
+            .Receive(Reply.Status.Ok, reply =>
+            {
+                EventManager.GetInstance().PostNotification(EVENT_TYPE.JOIN_GAME_SUCCESS);
+                Debug.Log(string.Format("Join game {0} ok.", gameID));
+            })
+            .Receive(Reply.Status.Error, reply =>
+            {
+                EventManager.GetInstance().PostNotification(EVENT_TYPE.JOIN_GAME_FAILED);
+                Debug.Log(string.Format("Join game {0} failed.", gameID));
+            })
             .Receive(Reply.Status.Timeout, reply => Debug.Log("Time out"));
     }
 
@@ -226,8 +240,10 @@ public class Connection : MonoBehaviour, IListener
                 gameChannel.Push("game:place_piece", pieceCoord);
                 break;
             case EVENT_TYPE.JOIN_GAME:
-                string gameID = (string)param;
-                JoinGame(gameID);
+                var gameInfo = (KeyValuePair<string, string>)param;
+                string gameID = gameInfo.Key;
+                string password = gameInfo.Value;
+                JoinGame(gameID, password);
                 break;
             default:
                 break;

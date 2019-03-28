@@ -19,6 +19,10 @@ public class GameUI : MonoBehaviour, IListener
     public GameObject lobbyPanel;
     public Button openCreateGame;
     public GameObject createGamePanel;
+    public GameObject passwordPanel;
+    public GameObject wrongPasswordAlert;
+    public InputField passwordInput;
+    public Button joinGame;
 
     //game panel
     public GameObject gamePanel;
@@ -30,11 +34,17 @@ public class GameUI : MonoBehaviour, IListener
 
     public PlayerScore[] players;
 
+    private string currentGameID;
+
     void Start()
     {
         setUsername.onClick.AddListener(SetName);
         restartButton.onClick.AddListener(gameManager.Restart);
-        quitButton.onClick.AddListener(gameManager.Restart);
+        quitButton.onClick.AddListener(() =>
+        {
+            connection.SocketDisconnect();
+            gameManager.Restart();
+        });
         string username = PlayerPrefs.GetString("username", "");
         if (username == "")
         {
@@ -55,9 +65,14 @@ public class GameUI : MonoBehaviour, IListener
         gamePanel.SetActive(false);
         gameOverPanel.SetActive(false);
         createGamePanel.SetActive(false);
+        passwordPanel.SetActive(false);
+        wrongPasswordAlert.SetActive(false);
         EventManager.GetInstance().AddListener(EVENT_TYPE.SOCKET_READY, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.SCORE_CHANGE, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME, this);
+        EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME_PASSWORD, this);
+        EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME_SUCCESS, this);
+        EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME_FAILED, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.GAMEOVER, this);
     }
 
@@ -73,6 +88,12 @@ public class GameUI : MonoBehaviour, IListener
     {
         SoundManager.GetInstance().MakeClickSound();
         createGamePanel.SetActive(true);
+    }
+
+    public void JoinGamePassword(string gameID)
+    {
+        string password = passwordInput.text;
+        connection.JoinGame(gameID, password);
     }
 
     public void Ready()
@@ -101,7 +122,17 @@ public class GameUI : MonoBehaviour, IListener
             case EVENT_TYPE.SOCKET_READY:
                 openCreateGame.gameObject.SetActive(true);
                 break;
-            case EVENT_TYPE.JOIN_GAME:
+            case EVENT_TYPE.JOIN_GAME_PASSWORD:
+                string gameID = (string)param;
+                joinGame.onClick.AddListener(() => JoinGamePassword(gameID));
+                passwordPanel.SetActive(true);
+                wrongPasswordAlert.SetActive(false);
+                break;
+            case EVENT_TYPE.JOIN_GAME_FAILED:
+                wrongPasswordAlert.SetActive(true);
+                break;
+            case EVENT_TYPE.JOIN_GAME_SUCCESS:
+                wrongPasswordAlert.SetActive(false);
                 lobbyPanel.SetActive(false);
                 gamePanel.SetActive(true);
                 break;
