@@ -68,7 +68,7 @@ public class Connection : MonoBehaviour, IListener
         lobbyChannel = socket.MakeChannel("lobby");
         lobbyChannel.On("update_games", data =>
         {
-            Debug.Log(string.Format("------on update_games------ {0}", MessageSerialization.Serialize(data)));
+            // Debug.Log(string.Format("------on update_games------ {0}", MessageSerialization.Serialize(data)));
             var games = data.payload["games"];
             // List<string> games = new List<string>();
             // foreach (JToken item in gamesData)
@@ -121,7 +121,7 @@ public class Connection : MonoBehaviour, IListener
         gameChannel.Join(param)
             .Receive(Reply.Status.Ok, reply =>
             {
-                EventManager.GetInstance().PostNotification(EVENT_TYPE.JOIN_GAME_SUCCESS);
+                EventManager.GetInstance().PostNotification(EVENT_TYPE.JOIN_GAME_SUCCESS, null, gameID);
                 Debug.Log(string.Format("Join game {0} ok.", gameID));
             })
             .Receive(Reply.Status.Error, reply =>

@@ -42,7 +42,7 @@ public class InputManager : MonoBehaviour
             if (!tile) return;
             if (tile.tag == Constants.MOVABLE_TAG)
             {
-                draggedObject.transform.position = inputPosition + Vector3.one * touchOffset;
+                draggedObject.transform.position = inputPosition + (new Vector3(0, 1, 1)) * touchOffset;
             }
         }
         else
@@ -66,7 +66,7 @@ public class InputManager : MonoBehaviour
             if (draggedObject == null) return;
             draggingItem = true;
             touchOffset = (Vector2)draggedObject.transform.position - inputPosition;
-            draggedObject.transform.position = inputPosition + Vector3.one * touchOffset;
+            draggedObject.transform.position = inputPosition + (new Vector3(0, 1, 1)) * touchOffset;
             draggedObject.transform.GetComponent<Tile>().PickUp();
         }
     }

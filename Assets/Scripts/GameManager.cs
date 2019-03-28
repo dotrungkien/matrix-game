@@ -33,10 +33,10 @@ public class GameManager : MonoBehaviour, IListener
     public Transform grid1SpawnPos;
     public Transform grid2SpawnPos;
 
-
     public bool isGameOver = false;
 
     private string myID;
+    private Color myColor;
     public Dictionary<string, GridBase> grids = new Dictionary<string, GridBase>();
 
     void Start()
@@ -59,11 +59,15 @@ public class GameManager : MonoBehaviour, IListener
         {
             GridBase grid = Instantiate(gridPrefab, spawnPosition.position, Quaternion.identity, spawnPosition);
             grid.gameObject.name = state.player_nick;
-            if (isMe) grid.transform.tag = Constants.PLACEABLE_TAG;
+            if (isMe)
+            {
+                grid.transform.tag = Constants.PLACEABLE_TAG;
+                myColor = colors[grids.Count];
+            }
             SpriteRenderer render = grid.GetComponent<SpriteRenderer>();
             render.color = colors[grids.Count];
             grids[player_id] = grid;
-            ActiveGrid(state.player_nick);
+            if (!isMe) ActiveGrid(state.player_nick);
         }
         grids[player_id].UpdateState(state);
     }
@@ -101,7 +105,7 @@ public class GameManager : MonoBehaviour, IListener
     {
         Tile tile = Instantiate(tilePrefab, tileSpawnPos.position, Quaternion.identity, tileSpawnPos);
         tile.transform.tag = Constants.MOVABLE_TAG;
-        tile.GetComponent<SpriteRenderer>().color = colors[0];
+        tile.GetComponent<SpriteRenderer>().color = myColor;
         tile.SetVal(piece);
     }
 

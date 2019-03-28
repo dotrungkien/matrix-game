@@ -25,6 +25,7 @@ public class GameUI : MonoBehaviour, IListener
     public Button joinGame;
 
     //game panel
+    public Text gameIDLabel;
     public GameObject gamePanel;
     public GameObject gameOverPanel;
     public GameObject readyPanel;
@@ -132,6 +133,8 @@ public class GameUI : MonoBehaviour, IListener
                 wrongPasswordAlert.SetActive(true);
                 break;
             case EVENT_TYPE.JOIN_GAME_SUCCESS:
+                string id = (string)param;
+                gameIDLabel.text = id;
                 wrongPasswordAlert.SetActive(false);
                 lobbyPanel.SetActive(false);
                 gamePanel.SetActive(true);
