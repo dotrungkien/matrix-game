@@ -75,7 +75,7 @@ public class GameManager : MonoBehaviour, IListener
             {
                 Transform activeGrid = item.Value.transform;
                 activeGrid.parent = grid2SpawnPos;
-                activeGrid.position = Vector3.zero;
+                activeGrid.localPosition = Vector3.zero;
             }
             else
             {
@@ -84,7 +84,7 @@ public class GameManager : MonoBehaviour, IListener
                 {
                     Transform inactiveGrid = item.Value.transform;
                     inactiveGrid.parent = inactivePos;
-                    inactiveGrid.position = Vector3.zero;
+                    inactiveGrid.localPosition = Vector3.zero;
                 }
             }
         }

@@ -10,7 +10,6 @@ public class Connection : MonoBehaviour, IListener
     [HideInInspector]
     public string myID;
 
-
     public GameManager gameManager;
     public ListGames listGames;
 

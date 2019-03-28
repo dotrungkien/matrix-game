@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.EventSystems;
 
 public class InputManager : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class InputManager : MonoBehaviour
         if (gameManager.isGameOver) return;
         if (Input.GetMouseButton(0))
         {
+            if (EventSystem.current.IsPointerOverGameObject()) return;
             DragOrPickUp();
         }
         else

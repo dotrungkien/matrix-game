@@ -26,11 +26,11 @@ public class Tile : MonoBehaviour
     public void SetVal(int[] val)
     {
         topVal = val[0];
-        top.sprite = renders[topVal - 7];
+        top.sprite = renders[topVal];
         midVal = val[1];
-        mid.sprite = renders[midVal - 7];
+        mid.sprite = renders[midVal];
         botVal = val[2];
-        bot.sprite = renders[botVal - 7];
+        bot.sprite = renders[botVal];
         render = GetComponent<SpriteRenderer>();
         render.color = (transform.tag == Constants.MOVABLE_TAG) ? new Color(0.39f, 0.78f, 0.47f) : new Color(0.30f, 0.59f, 0.83f);
     }
