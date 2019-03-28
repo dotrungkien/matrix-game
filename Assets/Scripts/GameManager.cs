@@ -60,8 +60,10 @@ public class GameManager : MonoBehaviour, IListener
             GridBase grid = Instantiate(gridPrefab, spawnPosition.position, Quaternion.identity, spawnPosition);
             grid.gameObject.name = state.player_nick;
             if (isMe) grid.transform.tag = Constants.PLACEABLE_TAG;
-            grid.GetComponent<SpriteRenderer>().color = colors[grids.Count];
+            SpriteRenderer render = grid.GetComponent<SpriteRenderer>();
+            render.color = colors[grids.Count];
             grids[player_id] = grid;
+            ActiveGrid(state.player_nick);
         }
         grids[player_id].UpdateState(state);
     }
