@@ -17,7 +17,8 @@ public class GameUI : MonoBehaviour, IListener
     // lobby panel
     public Text usernameText;
     public GameObject lobbyPanel;
-    public Button createGameButton;
+    public Button openCreateGame;
+    public GameObject createGamePanel;
 
     //game panel
     public GameObject gamePanel;
@@ -47,14 +48,15 @@ public class GameUI : MonoBehaviour, IListener
         }
 
         usernameText.text = username;
-        createGameButton.onClick.AddListener(CreateGame);
+        openCreateGame.onClick.AddListener(OpenCreateGame);
         readyButton.onClick.AddListener(Ready);
-        createGameButton.gameObject.SetActive(false);
+        openCreateGame.gameObject.SetActive(false);
 
         readyPanel.SetActive(true);
         lobbyPanel.SetActive(true);
         gamePanel.SetActive(false);
         gameOverPanel.SetActive(false);
+        createGamePanel.SetActive(false);
         EventManager.GetInstance().AddListener(EVENT_TYPE.SOCKET_READY, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.SCORE_CHANGE, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME, this);
@@ -69,12 +71,10 @@ public class GameUI : MonoBehaviour, IListener
           .Select(s => s[random.Next(s.Length)]).ToArray());
     }
 
-    public void CreateGame()
+    public void OpenCreateGame()
     {
         SoundManager.GetInstance().MakeClickSound();
-        connection.CreateNewGame();
-        lobbyPanel.SetActive(false);
-        gamePanel.SetActive(true);
+        createGamePanel.SetActive(true);
     }
 
     public void Ready()
@@ -101,7 +101,7 @@ public class GameUI : MonoBehaviour, IListener
         switch (eventType)
         {
             case EVENT_TYPE.SOCKET_READY:
-                createGameButton.gameObject.SetActive(true);
+                openCreateGame.gameObject.SetActive(true);
                 break;
             case EVENT_TYPE.JOIN_GAME:
                 lobbyPanel.SetActive(false);

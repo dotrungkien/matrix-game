@@ -1,19 +1,27 @@
-﻿using System.Collections;
+﻿using System;
+using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class CreateGame : MonoBehaviour
 {
+    public GameObject lobbyPanel;
+    public GameObject gamePanel;
+    public Connection connection;
     public Button[] modeButtons;
     public Button[] maxPlayerButtons;
     public Button[] timeLimitButtons;
+    public Button randomPassword;
+    public Button createGame;
+    public InputField passwordInput;
 
     private string mode;
     private string maxPlayers;
     private string timeLimit;
 
-    private Color activeColor = new Color(01f, 0.5f, 0);
+    private Color activeColor = new Color(1f, 0.5f, 0);
     private Color inactiveColor = Color.white;
 
     private void Start()
@@ -21,26 +29,45 @@ public class CreateGame : MonoBehaviour
         modeButtons[0].image.color = activeColor;
         maxPlayerButtons[0].image.color = activeColor;
         timeLimitButtons[0].image.color = activeColor;
-        for (int i = 0; i < modeButtons.Length; i++)
+        randomPassword.onClick.AddListener(RandomPassword);
+        createGame.onClick.AddListener(CreateAndStart);
+        for (int i = 0; i < 3; i++)
         {
-            modeButtons[i].onClick.AddListener(() => SelectMode(i));
-        }
-        for (int i = 0; i < maxPlayerButtons.Length; i++)
-        {
-            maxPlayerButtons[i].onClick.AddListener(() => SelectMaxPlayer(i));
-        }
-        for (int i = 0; i < timeLimitButtons.Length; i++)
-        {
-            timeLimitButtons[i].onClick.AddListener(() => SelectTimeLimit(i));
+            int j = i;
+            modeButtons[i].onClick.AddListener(() => SelectMode(j));
+            maxPlayerButtons[i].onClick.AddListener(() => SelectMaxPlayer(j));
+            timeLimitButtons[i].onClick.AddListener(() => SelectTimeLimit(j));
         }
     }
+
+    public void CreateAndStart()
+    {
+        connection.CreateNewGame(maxPlayers, mode, timeLimit, passwordInput.text);
+        lobbyPanel.SetActive(false);
+        gamePanel.SetActive(true);
+    }
+
+    public void RandomPassword()
+    {
+        string pass = RandomString(6);
+        passwordInput.text = pass;
+    }
+
+    public string RandomString(int length)
+    {
+        System.Random random = new System.Random();
+        const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+        return new string(Enumerable.Repeat(chars, length)
+          .Select(s => s[random.Next(s.Length)]).ToArray());
+    }
+
     public void SelectMode(int idx)
     {
 
         if (idx == 0)
         {
             mode = "easy";
-            maxPlayerButtons[0].image.color = activeColor;
+            modeButtons[0].image.color = activeColor;
             modeButtons[1].image.color = inactiveColor;
             modeButtons[2].image.color = inactiveColor;
         }
