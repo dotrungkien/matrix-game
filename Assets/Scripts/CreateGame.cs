@@ -15,6 +15,7 @@ public class CreateGame : MonoBehaviour
     public Button[] timeLimitButtons;
     public Button randomPassword;
     public Button createGame;
+    public Button close;
     public InputField passwordInput;
 
     private string mode;
@@ -31,6 +32,7 @@ public class CreateGame : MonoBehaviour
         timeLimitButtons[0].image.color = activeColor;
         randomPassword.onClick.AddListener(RandomPassword);
         createGame.onClick.AddListener(CreateAndStart);
+        close.onClick.AddListener(Close);
         for (int i = 0; i < 3; i++)
         {
             int j = i;
@@ -40,6 +42,10 @@ public class CreateGame : MonoBehaviour
         }
     }
 
+    public void Close()
+    {
+        gameObject.SetActive(false);
+    }
     public void CreateAndStart()
     {
         connection.CreateNewGame(maxPlayers, mode, timeLimit, passwordInput.text);

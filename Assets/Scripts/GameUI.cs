@@ -22,8 +22,6 @@ public class GameUI : MonoBehaviour, IListener
 
     //game panel
     public GameObject gamePanel;
-    public Text myScore;
-    public Text otherScore;
     public GameObject gameOverPanel;
     public GameObject readyPanel;
     public Button restartButton;
