@@ -74,6 +74,8 @@ public class GameManager : MonoBehaviour, IListener
 
     public void ActiveGrid(string player_nick)
     {
+        string username = PlayerPrefs.GetString("username", "");
+        if (player_nick == username) return;
         foreach (KeyValuePair<string, GridBase> item in grids)
         {
             string gridName = item.Value.name;
@@ -83,7 +85,6 @@ public class GameManager : MonoBehaviour, IListener
             }
             else
             {
-                string username = PlayerPrefs.GetString("username", "");
                 if (gridName != username)
                 {
                     item.Value.gameObject.SetActive(false);
@@ -94,15 +95,19 @@ public class GameManager : MonoBehaviour, IListener
 
     public void UpdateGridData(string player_id, Dictionary<string, int> gridData, JToken piece)
     {
-        if (myID != player_id)
-        {
-            grids[player_id].PlacePiece(piece);
-        }
+        // if (myID != player_id)
+        // {
+        grids[player_id].PlacePiece(piece);
+        // }
         grids[player_id].UpdateData(gridData);
     }
 
     public void SpawnNewTiles(int[] piece)
     {
+        foreach (Transform child in tileSpawnPos.transform)
+        {
+            if (child != null) GameObject.Destroy(child.gameObject);
+        }
         Tile tile = Instantiate(tilePrefab, tileSpawnPos.position, Quaternion.identity, tileSpawnPos);
         tile.transform.tag = Constants.MOVABLE_TAG;
         tile.GetComponent<SpriteRenderer>().color = myColor;

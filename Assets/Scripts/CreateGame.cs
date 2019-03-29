@@ -49,6 +49,8 @@ public class CreateGame : MonoBehaviour
     }
     public void CreateAndStart()
     {
+        int limit;
+        Int32.TryParse(timeLimit, out limit);
         connection.CreateNewGame(mode, maxPlayers, timeLimit, passwordInput.text);
         lobbyPanel.SetActive(false);
         gamePanel.SetActive(true);

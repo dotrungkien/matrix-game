@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,21 +27,30 @@ public class GameUI : MonoBehaviour, IListener
 
     //game panel
     public Text gameIDLabel;
+    public Text timingText;
     public GameObject gamePanel;
     public GameObject gameOverPanel;
     public GameObject readyPanel;
-    public Button restartButton;
     public Button quitButton;
     public Button readyButton;
 
     public PlayerScore[] players;
 
+    public int timeLimit = 0;
     private string currentGameID;
+    private int playTime;
+    public DateTime timeStart;
+    private DateTime timeNow;
+    private bool isPlaying;
 
     void Start()
     {
+        timeStart = DateTime.Now;
+        timingText.text = "00:00";
+        if (timeLimit == 0) timingText.gameObject.SetActive(false);
+        playTime = 0;
+
         setUsername.onClick.AddListener(SetName);
-        restartButton.onClick.AddListener(gameManager.Restart);
         quitButton.onClick.AddListener(() =>
         {
             connection.SocketDisconnect();
@@ -55,7 +65,6 @@ public class GameUI : MonoBehaviour, IListener
         {
             setUsernamePanel.SetActive(false);
         }
-
         usernameText.text = username;
         openCreateGame.onClick.AddListener(OpenCreateGame);
         readyButton.onClick.AddListener(Ready);
@@ -71,10 +80,30 @@ public class GameUI : MonoBehaviour, IListener
         EventManager.GetInstance().AddListener(EVENT_TYPE.SOCKET_READY, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.SCORE_CHANGE, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME, this);
+        EventManager.GetInstance().AddListener(EVENT_TYPE.NEW_PIECE, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME_PASSWORD, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME_SUCCESS, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME_FAILED, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.GAMEOVER, this);
+    }
+
+    public void Update()
+    {
+        if (isPlaying && timeLimit != 0)
+        {
+            timeNow = DateTime.Now;
+
+            TimeSpan timeSpan = timeNow - timeStart;
+            playTime = timeLimit * 1000 - (int)timeSpan.TotalMilliseconds;
+            int second = (int)(playTime / 1000) % 60;
+            // int milSecond = (int)(playTime % 1000) / 10;
+            timingText.text = string.Format("{0:00}", second);
+        }
+    }
+
+    public void ResetTime()
+    {
+        timeStart = DateTime.Now;
     }
 
     public string RandomString(int length)
@@ -123,6 +152,16 @@ public class GameUI : MonoBehaviour, IListener
             case EVENT_TYPE.SOCKET_READY:
                 openCreateGame.gameObject.SetActive(true);
                 break;
+
+            case EVENT_TYPE.NEW_PIECE:
+                if (!isPlaying) isPlaying = true;
+                if (timeLimit != 0)
+                {
+                    if (!timingText.gameObject.activeSelf) timingText.gameObject.SetActive(true);
+                    ResetTime();
+                }
+                break;
+
             case EVENT_TYPE.JOIN_GAME_PASSWORD:
                 string gameID = (string)param;
                 joinGame.onClick.AddListener(() => JoinGamePassword(gameID));
@@ -151,14 +190,11 @@ public class GameUI : MonoBehaviour, IListener
                     if (!players[index].isListening)
                     {
                         players[index].GetComponent<Image>().color = gameManager.colors[index];
-                        if (index != 0)
+                        Button activeSelf = players[index].GetComponent<Button>();
+                        activeSelf.onClick.AddListener(() =>
                         {
-                            Button activeSelf = players[index].GetComponent<Button>();
-                            activeSelf.onClick.AddListener(() =>
-                            {
-                                gameManager.ActiveGrid(player_nick);
-                            });
-                        }
+                            gameManager.ActiveGrid(player_nick);
+                        });
 
                         players[index].isListening = true;
                     }
@@ -166,6 +202,7 @@ public class GameUI : MonoBehaviour, IListener
                 break;
             case EVENT_TYPE.GAMEOVER:
                 gameOverPanel.SetActive(true);
+                isPlaying = false;
                 break;
             default:
                 break;
