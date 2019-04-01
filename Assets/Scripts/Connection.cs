@@ -18,7 +18,6 @@ public class Connection : MonoBehaviour, IListener
     private Channel lobbyChannel;
     private Channel gameChannel;
 
-
     void Start()
     {
         myID = PlayerPrefs.GetString("myID", "");
@@ -71,11 +70,6 @@ public class Connection : MonoBehaviour, IListener
         {
             // Debug.Log(string.Format("------on update_games------ {0}", MessageSerialization.Serialize(data)));
             var games = data.payload["games"];
-            // List<string> games = new List<string>();
-            // foreach (JToken item in gamesData)
-            // {
-            //     if (!(bool)item["locked"]) games.Add((string)item["id"]);
-            // }
             if (listGames.gameObject.activeSelf) listGames.UpdateGames(games);
         });
         var param = new Dictionary<string, object> { };
@@ -118,7 +112,7 @@ public class Connection : MonoBehaviour, IListener
             {"nick", username},
             {"password", password}
         };
-        Debug.Log(string.Format("JOining game {0} {1} {2}", gameID, username, password));
+        Debug.Log(string.Format("Joining game {0} {1} {2}", gameID, username, password));
         gameChannel.Join(param)
             .Receive(Reply.Status.Ok, reply =>
             {
@@ -139,7 +133,6 @@ public class Connection : MonoBehaviour, IListener
         gameChannel.On("game:new_piece", data =>
         {
             // Debug.Log(string.Format("------on new_piece------ {0}", MessageSerialization.Serialize(data)));
-
             var piece = data.payload["piece"];
             int[] pieceVal = piece.ToObject<int[]>();
             SoundManager.GetInstance().MakeClickSound();
@@ -147,7 +140,7 @@ public class Connection : MonoBehaviour, IListener
         });
         gameChannel.On("game:player_joined", data =>
         {
-            Debug.Log(string.Format("------on player_joined------ {0}", MessageSerialization.Serialize(data)));
+            // Debug.Log(string.Format("------on player_joined------ {0}", MessageSerialization.Serialize(data)));
             var game = data.payload["game"];
             gameUI.timeLimit = (int)game["time_limit"];
             string[] players = game["players"].ToObject<string[]>();
@@ -168,10 +161,6 @@ public class Connection : MonoBehaviour, IListener
             }
             EventManager.GetInstance().PostNotification(EVENT_TYPE.SCORE_CHANGE, null, playerScores);
         });
-        gameChannel.On("game:started", data =>
-        {
-            Debug.Log(MessageSerialization.Serialize(data));
-        });
         gameChannel.On("game:stopped", data =>
         {
             Debug.Log(MessageSerialization.Serialize(data));
@@ -191,7 +180,7 @@ public class Connection : MonoBehaviour, IListener
         });
         gameChannel.On("game:place_piece", data =>
         {
-            // Debug.Log(string.Format("------on place_piece----- {0}", MessageSerialization.Serialize(data)));
+            Debug.Log(string.Format("------on place_piece----- {0}", MessageSerialization.Serialize(data)));
             var game = data.payload["game"];
             string sender = (string)data.payload["player_id"];
             string[] players = game["players"].ToObject<string[]>();
@@ -246,6 +235,10 @@ public class Connection : MonoBehaviour, IListener
                 string gameID = gameInfo.Key;
                 string password = gameInfo.Value;
                 JoinGame(gameID, password);
+                break;
+            case EVENT_TYPE.WATCH_GAME:
+                EventManager.GetInstance().isWatchingMode = true;
+                JoinGame((string)param);
                 break;
             default:
                 break;

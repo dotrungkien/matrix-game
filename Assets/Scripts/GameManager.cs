@@ -139,7 +139,8 @@ public class GameManager : MonoBehaviour, IListener
                 break;
             case EVENT_TYPE.NEW_PIECE:
                 int[] pieceVal = (int[])param;
-                SpawnNewTiles(pieceVal);
+                bool isWatching = EventManager.GetInstance().isWatchingMode;
+                if (!isWatching) SpawnNewTiles(pieceVal);
                 break;
             default:
                 break;

@@ -81,6 +81,8 @@ public class GameInfo : MonoBehaviour
 
     public void WatchGame()
     {
-        Debug.Log("Watching");
+        SoundManager.GetInstance().MakeClickSound();
+        EventManager.GetInstance().PostNotification(EVENT_TYPE.WATCH_GAME, this, gameID);
+        Debug.Log(string.Format("Watching game {0}", gameID));
     }
 }

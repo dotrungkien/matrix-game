@@ -6,6 +6,8 @@ using System.Collections.Generic;
 
 public class EventManager : Singleton<EventManager>
 {
+    public bool isWatchingMode = false;
+
     private Dictionary<EVENT_TYPE, List<IListener>> listeners = new Dictionary<EVENT_TYPE, List<IListener>>();
 
     public void AddListener(EVENT_TYPE eventType, IListener listener)
