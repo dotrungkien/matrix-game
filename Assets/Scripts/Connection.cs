@@ -17,6 +17,7 @@ public class Connection : MonoBehaviour, IListener
     private Socket socket = null;
     private Channel lobbyChannel;
     private Channel gameChannel;
+    private bool initGrids;
 
     void Start()
     {
@@ -28,8 +29,11 @@ public class Connection : MonoBehaviour, IListener
         }
 
         SocketConnect();
+        initGrids = false;
+        EventManager.GetInstance().isWatching = false;
         EventManager.GetInstance().AddListener(EVENT_TYPE.PLACE_PIECE, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME, this);
+        EventManager.GetInstance().AddListener(EVENT_TYPE.WATCH_GAME, this);
     }
 
     public void SocketDisconnect()
@@ -42,7 +46,7 @@ public class Connection : MonoBehaviour, IListener
         socket = new Socket(new BestHTTPWebsocketFactory());
         Socket.OnOpenDelegate onOpenCallback = () =>
         {
-            Debug.Log("Socket on open.");
+            // Debug.Log("Socket on open.");
             JoinLobby();
         };
         Socket.OnClosedDelegate onCloseCallback = (code, message) => Debug.Log(string.Format("Socket on close. {0} {1}", code, message));
@@ -77,7 +81,7 @@ public class Connection : MonoBehaviour, IListener
             .Receive(Reply.Status.Ok, reply =>
             {
                 EventManager.GetInstance().PostNotification(EVENT_TYPE.SOCKET_READY);
-                Debug.Log("Join lobbyChannel ok.");
+                // Debug.Log("Join lobbyChannel ok.");
             })
             .Receive(Reply.Status.Error, reply => Debug.Log("Join lobbyChannel failed."))
             .Receive(Reply.Status.Timeout, reply => Debug.Log("Time out"));
@@ -180,15 +184,41 @@ public class Connection : MonoBehaviour, IListener
         });
         gameChannel.On("game:place_piece", data =>
         {
-            Debug.Log(string.Format("------on place_piece----- {0}", MessageSerialization.Serialize(data)));
-            var game = data.payload["game"];
-            string sender = (string)data.payload["player_id"];
+            var game = data.payload["game"]; ;
             string[] players = game["players"].ToObject<string[]>();
+            string player_nick;
+
+            // Debug.Log(string.Format("------on place_piece----- {0}", MessageSerialization.Serialize(data)));
+            if (!initGrids && EventManager.GetInstance().isWatching)
+            {
+                Debug.Log("Connection on watching");
+                gameUI.timeLimit = (int)game["time_limit"];
+                string[] player_nicks = game["player_nicks"].ToObject<string[]>();
+                var playerScores = new Dictionary<int, KeyValuePair<string, string>>();
+                for (int i = 0; i < players.Length; i++)
+                {
+                    string player_id = players[i];
+                    player_nick = player_nicks[i];
+                    int point = game["points"][player_id].ToObject<int>();
+                    playerScores[i] = new KeyValuePair<string, string>(player_nick, (string)game["points"][player_id]);
+                    string game_id = game["id"].ToObject<string>();
+                    Dictionary<string, int> grid = game["player_boards"][player_id]["grid"].ToObject<Dictionary<string, int>>();
+                    GridState state = new GridState(
+                            player_id, player_nick, point, game_id, grid
+                        );
+                    gameManager.UpdateGrid(player_id, state);
+                }
+                EventManager.GetInstance().PostNotification(EVENT_TYPE.SCORE_CHANGE, null, playerScores);
+                initGrids = true;
+                return;
+            }
+
+            string sender = (string)data.payload["player_id"];
             int index = Array.IndexOf(players, sender);
-            string player_nick = (string)game["player_boards"][sender]["nick"];
+            player_nick = (string)game["player_boards"][sender]["nick"];
             Dictionary<string, int> gridData = game["player_boards"][sender]["grid"].ToObject<Dictionary<string, int>>();
-            string point = (string)game["points"][sender];
-            var playerScore = new KeyValuePair<string, string>(player_nick, point);
+            string pointStr = (string)game["points"][sender];
+            var playerScore = new KeyValuePair<string, string>(player_nick, pointStr);
             var param = new Dictionary<int, KeyValuePair<string, string>> { { index, playerScore } };
             EventManager.GetInstance().PostNotification(EVENT_TYPE.SCORE_CHANGE, null, param);
             var piece = data.payload["piece"];
@@ -237,7 +267,7 @@ public class Connection : MonoBehaviour, IListener
                 JoinGame(gameID, password);
                 break;
             case EVENT_TYPE.WATCH_GAME:
-                EventManager.GetInstance().isWatchingMode = true;
+                EventManager.GetInstance().isWatching = true;
                 JoinGame((string)param);
                 break;
             default:

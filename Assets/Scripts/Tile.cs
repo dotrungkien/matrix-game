@@ -87,7 +87,8 @@ public class Tile : MonoBehaviour
         else
         {
             transform.parent = currentCell;
-            render.color = currentCell.parent.parent.GetComponent<SpriteRenderer>().color;
+            // render.color = currentCell.parent.parent.GetComponent<SpriteRenderer>().color;
+            render.enabled = false;
             StartCoroutine(SlotIntoPlace(transform.position, newPosition));
         }
     }

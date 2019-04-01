@@ -53,6 +53,7 @@ public class GameUI : MonoBehaviour, IListener
         setUsername.onClick.AddListener(SetName);
         quitButton.onClick.AddListener(() =>
         {
+            EventManager.GetInstance().isWatching = false;
             connection.SocketDisconnect();
             gameManager.Restart();
         });
@@ -79,7 +80,7 @@ public class GameUI : MonoBehaviour, IListener
         wrongPasswordAlert.SetActive(false);
         EventManager.GetInstance().AddListener(EVENT_TYPE.SOCKET_READY, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.SCORE_CHANGE, this);
-        EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME, this);
+        EventManager.GetInstance().AddListener(EVENT_TYPE.WATCH_GAME, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.NEW_PIECE, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME_PASSWORD, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME_SUCCESS, this);
@@ -161,7 +162,9 @@ public class GameUI : MonoBehaviour, IListener
                     ResetTime();
                 }
                 break;
-
+            case EVENT_TYPE.WATCH_GAME:
+                readyPanel.SetActive(false);
+                break;
             case EVENT_TYPE.JOIN_GAME_PASSWORD:
                 string gameID = (string)param;
                 joinGame.onClick.AddListener(() => JoinGamePassword(gameID));

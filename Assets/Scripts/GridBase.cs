@@ -9,12 +9,7 @@ public class GridBase : MonoBehaviour
     public float cellSize = 0.4f;
     int[,] grid = new int[9, 9];
     private int dim = 9;
-    private Color color;
 
-    void Start()
-    {
-        color = transform.GetComponent<SpriteRenderer>().color;
-    }
     public int[] KeyToGrid(string key)
     {
         int y = '8' - key[0];
@@ -155,6 +150,37 @@ public class GridBase : MonoBehaviour
         }
     }
 
+    public void UpdateStateFirstTime(GridState props)
+    {
+        var gridData = props.grid;
+        foreach (KeyValuePair<string, int> cell in gridData)
+        {
+            if (cell.Value == -1) continue;
+            var pos = KeyToGrid(cell.Key);
+            grid[pos[0], pos[1]] = cell.Value;
+        }
+        UpdatePieces();
+        UpdateStatus();
+    }
+
+    public void UpdatePieces()
+    {
+        for (int i = 0; i < dim; i++)
+        {
+            for (int j = 1; j < dim; j = j + 3)
+            {
+                if (grid[i, j] == 0) continue;
+                int top = grid[i, j + 1];
+                int mid = grid[i, j];
+                int bot = grid[i, j - 1];
+                Vector3 placePos = GridToPos(new int[2] { i, j });
+                Tile newTile = Instantiate(renderTile, placePos, Quaternion.identity, transform);
+                newTile.GetComponent<SpriteRenderer>().enabled = false;
+                newTile.SetVal(new int[] { top, mid, bot });
+            }
+        }
+    }
+
     public void UpdateState(GridState props)
     {
         var gridData = props.grid;
@@ -173,7 +199,7 @@ public class GridBase : MonoBehaviour
         int y = dim - 2 - (int)piece["y"];
         Vector3 placePos = GridToPos(new int[2] { x, y });
         Tile newTile = Instantiate(renderTile, placePos, Quaternion.identity, transform);
-        newTile.GetComponent<SpriteRenderer>().color = color;
+        newTile.GetComponent<SpriteRenderer>().enabled = false;
         newTile.SetVal(piece["values"].ToObject<int[]>());
     }
 

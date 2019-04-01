@@ -39,8 +39,11 @@ public class GameManager : MonoBehaviour, IListener
     private Color myColor;
     public Dictionary<string, GridBase> grids = new Dictionary<string, GridBase>();
 
+    private Dictionary<string, string> nickToID;
+
     void Start()
     {
+        nickToID = new Dictionary<string, string>();
         myID = PlayerPrefs.GetString("myID", "");
         EventManager.GetInstance().AddListener(EVENT_TYPE.SCORE_CHANGE, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.GAMEOVER, this);
@@ -50,31 +53,47 @@ public class GameManager : MonoBehaviour, IListener
     public void UpdateGrid(string player_id, GridState state)
     {
         bool isMe = (player_id == myID);
+        bool isWatching = EventManager.GetInstance().isWatching;
         Transform spawnPosition;
         if (isMe) spawnPosition = grid1SpawnPos;
-        else spawnPosition = grid2SpawnPos;
+        else
+        {
+            if (isWatching && grid1SpawnPos.childCount <= grid2SpawnPos.childCount)
+            {
+                spawnPosition = grid1SpawnPos;
+            }
+            else
+            {
+                spawnPosition = grid2SpawnPos;
+            }
+        }
 
-        GameObject target = GameObject.Find(state.player_nick);
+        GridBase target = null;
+        grids.TryGetValue(player_id, out target);
         if (target == null)
         {
-            GridBase grid = Instantiate(gridPrefab, spawnPosition.position, Quaternion.identity, spawnPosition);
-            grid.gameObject.name = state.player_nick;
+            target = Instantiate(gridPrefab, spawnPosition.position, Quaternion.identity, spawnPosition);
+            target.gameObject.name = state.player_nick;
             if (isMe)
             {
-                grid.transform.tag = Constants.PLACEABLE_TAG;
+                target.transform.tag = Constants.PLACEABLE_TAG;
                 myColor = colors[grids.Count];
             }
-            SpriteRenderer render = grid.GetComponent<SpriteRenderer>();
+            SpriteRenderer render = target.GetComponent<SpriteRenderer>();
             render.color = colors[grids.Count];
-            grids[player_id] = grid;
+            grids[player_id] = target;
+            nickToID[state.player_nick] = player_id;
             if (!isMe) ActiveGrid(state.player_nick);
+            Debug.Log("create target is" + target.name);
         }
-        grids[player_id].UpdateState(state);
+        if (isWatching) grids[player_id].UpdateStateFirstTime(state);
+        else grids[player_id].UpdateState(state);
     }
 
     public void ActiveGrid(string player_nick)
     {
         string username = PlayerPrefs.GetString("username", "");
+        Transform currentGrid = grids[nickToID[player_nick]].transform;
         if (player_nick == username) return;
         foreach (KeyValuePair<string, GridBase> item in grids)
         {
@@ -85,7 +104,9 @@ public class GameManager : MonoBehaviour, IListener
             }
             else
             {
-                if (gridName != username)
+                Transform otherGrid = item.Value.transform;
+                Debug.Log(string.Format("{0} {1} {2}", currentGrid.parent.name, otherGrid.parent.name, Object.ReferenceEquals(currentGrid.parent, otherGrid.parent)));
+                if (gridName != username && currentGrid != null && Object.ReferenceEquals(currentGrid.parent, otherGrid.parent))
                 {
                     item.Value.gameObject.SetActive(false);
                 }
@@ -95,10 +116,7 @@ public class GameManager : MonoBehaviour, IListener
 
     public void UpdateGridData(string player_id, Dictionary<string, int> gridData, JToken piece)
     {
-        // if (myID != player_id)
-        // {
         grids[player_id].PlacePiece(piece);
-        // }
         grids[player_id].UpdateData(gridData);
     }
 
@@ -139,7 +157,7 @@ public class GameManager : MonoBehaviour, IListener
                 break;
             case EVENT_TYPE.NEW_PIECE:
                 int[] pieceVal = (int[])param;
-                bool isWatching = EventManager.GetInstance().isWatchingMode;
+                bool isWatching = EventManager.GetInstance().isWatching;
                 if (!isWatching) SpawnNewTiles(pieceVal);
                 break;
             default:
