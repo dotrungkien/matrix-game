@@ -133,6 +133,7 @@ public class Connection : MonoBehaviour, IListener
     public void GameChannelSetup(string gameID)
     {
         gameChannel = socket.MakeChannel(string.Format("game:{0}", gameID));
+
         gameChannel.On("game:new_piece", data =>
         {
             // Debug.Log(string.Format("------on new_piece------ {0}", MessageSerialization.Serialize(data)));
@@ -141,9 +142,10 @@ public class Connection : MonoBehaviour, IListener
             SoundManager.GetInstance().MakeClickSound();
             EventManager.GetInstance().PostNotification(EVENT_TYPE.NEW_PIECE, this, pieceVal);
         });
+
         gameChannel.On("game:player_joined", data =>
         {
-            // Debug.Log(string.Format("------on player_joined------ {0}", MessageSerialization.Serialize(data)));
+            Debug.Log(string.Format("------on player_joined------ {0}", MessageSerialization.Serialize(data)));
             var game = data.payload["game"];
             gameUI.timeLimit = (int)game["time_limit"];
             DrawBoards(game);
@@ -246,7 +248,6 @@ public class Connection : MonoBehaviour, IListener
     {
         PlayerPrefs.DeleteKey("myID");
     }
-
 
     public void OnEvent(EVENT_TYPE eventType, Component sender, object param = null)
     {
