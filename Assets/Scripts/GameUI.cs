@@ -53,7 +53,7 @@ public class GameUI : MonoBehaviour, IListener
         setUsername.onClick.AddListener(SetName);
         quitButton.onClick.AddListener(() =>
         {
-            EventManager.GetInstance().isWatching = false;
+            GameManager.GetInstance().isWatching = false;
             connection.SocketDisconnect();
             gameController.Restart();
         });

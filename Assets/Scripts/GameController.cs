@@ -53,7 +53,7 @@ public class GameController : MonoBehaviour, IListener
     public void UpdateGrid(string player_id, GridState state)
     {
         bool isMe = (player_id == myID);
-        bool isWatching = EventManager.GetInstance().isWatching;
+        bool isWatching = GameManager.GetInstance().isWatching;
         Transform spawnPosition;
         if (isMe) spawnPosition = grid1SpawnPos;
         else
@@ -157,7 +157,7 @@ public class GameController : MonoBehaviour, IListener
                 break;
             case EVENT_TYPE.NEW_PIECE:
                 int[] pieceVal = (int[])param;
-                bool isWatching = EventManager.GetInstance().isWatching;
+                bool isWatching = GameManager.GetInstance().isWatching;
                 if (!isWatching) SpawnNewTiles(pieceVal);
                 break;
             default:

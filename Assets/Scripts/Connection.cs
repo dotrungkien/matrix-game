@@ -30,7 +30,7 @@ public class Connection : MonoBehaviour, IListener
 
         SocketConnect();
         initGrids = false;
-        EventManager.GetInstance().isWatching = false;
+        GameManager.GetInstance().isWatching = false;
         EventManager.GetInstance().AddListener(EVENT_TYPE.PLACE_PIECE, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.WATCH_GAME, this);
@@ -172,7 +172,7 @@ public class Connection : MonoBehaviour, IListener
             string player_nick;
 
             // Debug.Log(string.Format("------on place_piece----- {0}", MessageSerialization.Serialize(data)));
-            if (!initGrids && EventManager.GetInstance().isWatching)
+            if (!initGrids && GameManager.GetInstance().isWatching)
             {
                 Debug.Log("Connection on watching");
                 gameUI.timeLimit = (int)game["time_limit"];
@@ -269,7 +269,7 @@ public class Connection : MonoBehaviour, IListener
                 JoinGame(gameID, password);
                 break;
             case EVENT_TYPE.WATCH_GAME:
-                EventManager.GetInstance().isWatching = true;
+                GameManager.GetInstance().isWatching = true;
                 JoinGame((string)param);
                 break;
             default:

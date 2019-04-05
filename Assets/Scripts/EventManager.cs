@@ -27,8 +27,6 @@ public interface IListener
 
 public class EventManager : Singleton<EventManager>
 {
-    public bool isWatching = false;
-
     private Dictionary<EVENT_TYPE, List<IListener>> listeners = new Dictionary<EVENT_TYPE, List<IListener>>();
 
     public void AddListener(EVENT_TYPE eventType, IListener listener)
