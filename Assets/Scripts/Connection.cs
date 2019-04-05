@@ -147,23 +147,7 @@ public class Connection : MonoBehaviour, IListener
             // Debug.Log(string.Format("------on player_joined------ {0}", MessageSerialization.Serialize(data)));
             var game = data.payload["game"];
             gameUI.timeLimit = (int)game["time_limit"];
-            string[] players = game["players"].ToObject<string[]>();
-            string[] player_nicks = game["player_nicks"].ToObject<string[]>();
-            var playerScores = new Dictionary<int, KeyValuePair<string, string>>();
-            for (int i = 0; i < players.Length; i++)
-            {
-                string player_id = players[i];
-                string player_nick = player_nicks[i];
-                int point = game["points"][player_id].ToObject<int>();
-                playerScores[i] = new KeyValuePair<string, string>(player_nick, (string)game["points"][player_id]);
-                string game_id = game["id"].ToObject<string>();
-                Dictionary<string, int> grid = game["player_boards"][player_id]["grid"].ToObject<Dictionary<string, int>>();
-                GridState state = new GridState(
-                        player_id, player_nick, point, game_id, grid
-                    );
-                gameManager.UpdateGrid(player_id, state);
-            }
-            EventManager.GetInstance().PostNotification(EVENT_TYPE.SCORE_CHANGE, null, playerScores);
+            DrawBoards(game);
         });
         gameChannel.On("game:stopped", data =>
         {
@@ -224,6 +208,25 @@ public class Connection : MonoBehaviour, IListener
             var piece = data.payload["piece"];
             gameManager.UpdateGridData(sender, gridData, piece);
         });
+    }
+
+    public void DrawBoards(JToken game)
+    {
+        string[] players = game["players"].ToObject<string[]>();
+        string[] player_nicks = game["player_nicks"].ToObject<string[]>();
+        var playerScores = new Dictionary<int, KeyValuePair<string, string>>();
+        for (int i = 0; i < players.Length; i++)
+        {
+            string player_id = players[i];
+            string player_nick = player_nicks[i];
+            int point = game["points"][player_id].ToObject<int>();
+            playerScores[i] = new KeyValuePair<string, string>(player_nick, (string)game["points"][player_id]);
+            string game_id = game["id"].ToObject<string>();
+            Dictionary<string, int> grid = game["player_boards"][player_id]["grid"].ToObject<Dictionary<string, int>>();
+            GridState state = new GridState(player_id, player_nick, point, game_id, grid);
+            gameManager.UpdateGrid(player_id, state);
+        }
+        EventManager.GetInstance().PostNotification(EVENT_TYPE.SCORE_CHANGE, null, playerScores);
     }
 
     public void SetReady()

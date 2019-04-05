@@ -71,6 +71,11 @@ public class InputManager : MonoBehaviour
         }
     }
 
+    public void CancelDrag()
+    {
+        draggingItem = false;
+    }
+
     void DropItem()
     {
         draggingItem = false;

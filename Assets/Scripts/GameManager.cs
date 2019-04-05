@@ -72,8 +72,9 @@ public class GameManager : MonoBehaviour, IListener
         grids.TryGetValue(player_id, out target);
         if (target == null)
         {
+            string player_nick = state.player_nick;
             target = Instantiate(gridPrefab, spawnPosition.position, Quaternion.identity, spawnPosition);
-            target.gameObject.name = state.player_nick;
+            target.gameObject.name = player_nick;
             if (isMe)
             {
                 target.transform.tag = Constants.PLACEABLE_TAG;
@@ -82,9 +83,8 @@ public class GameManager : MonoBehaviour, IListener
             SpriteRenderer render = target.GetComponent<SpriteRenderer>();
             render.color = colors[grids.Count];
             grids[player_id] = target;
-            nickToID[state.player_nick] = player_id;
-            if (!isMe) ActiveGrid(state.player_nick);
-            Debug.Log("create target is" + target.name);
+            nickToID[player_nick] = player_id;
+            if (!isMe) ActiveGrid(player_nick);
         }
         if (isWatching) grids[player_id].UpdateStateFirstTime(state);
         else grids[player_id].UpdateState(state);

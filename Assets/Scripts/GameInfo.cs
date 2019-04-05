@@ -76,7 +76,6 @@ public class GameInfo : MonoBehaviour
     {
         var param = new KeyValuePair<string, string>(gameID, password);
         EventManager.GetInstance().PostNotification(EVENT_TYPE.JOIN_GAME, this, param);
-        Debug.Log(string.Format("Join game {0}", gameID));
     }
 
     public void WatchGame()
