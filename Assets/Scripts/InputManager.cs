@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 
 public class InputManager : MonoBehaviour
 {
-    private GameManager gameManager;
+    private GameController gameController;
 
     private bool draggingItem = false;
     private GameObject draggedObject;
@@ -12,8 +12,8 @@ public class InputManager : MonoBehaviour
 
     void Update()
     {
-        gameManager = GetComponent<GameManager>();
-        if (gameManager.isGameOver) return;
+        gameController = GetComponent<GameController>();
+        if (gameController.isGameOver) return;
         if (Input.GetMouseButton(0))
         {
             if (EventSystem.current.IsPointerOverGameObject()) return;

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class GameUI : MonoBehaviour, IListener
 {
-    public GameManager gameManager;
+    public GameController gameController;
     public Connection connection;
 
     // public set usetname panel
@@ -55,7 +55,7 @@ public class GameUI : MonoBehaviour, IListener
         {
             EventManager.GetInstance().isWatching = false;
             connection.SocketDisconnect();
-            gameManager.Restart();
+            gameController.Restart();
         });
         string username = PlayerPrefs.GetString("username", "");
         if (username == "")
@@ -192,11 +192,11 @@ public class GameUI : MonoBehaviour, IListener
                     players[index].UpdatePlayer(playerScore.Key, playerScore.Value);
                     if (!players[index].isListening)
                     {
-                        players[index].GetComponent<Image>().color = gameManager.colors[index];
+                        players[index].GetComponent<Image>().color = gameController.colors[index];
                         Button activeSelf = players[index].GetComponent<Button>();
                         activeSelf.onClick.AddListener(() =>
                         {
-                            gameManager.ActiveGrid(player_nick);
+                            gameController.ActiveGrid(player_nick);
                         });
 
                         players[index].isListening = true;

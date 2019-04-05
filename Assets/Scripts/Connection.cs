@@ -10,7 +10,7 @@ public class Connection : MonoBehaviour, IListener
     [HideInInspector]
     public string myID;
 
-    public GameManager gameManager;
+    public GameController gameController;
     public GameUI gameUI;
     public ListGames listGames;
 
@@ -116,7 +116,6 @@ public class Connection : MonoBehaviour, IListener
             {"nick", username},
             {"password", password}
         };
-        Debug.Log(string.Format("Joining game {0} {1} {2}", gameID, username, password));
         gameChannel.Join(param)
             .Receive(Reply.Status.Ok, reply =>
             {
@@ -190,7 +189,7 @@ public class Connection : MonoBehaviour, IListener
                     GridState state = new GridState(
                             player_id, player_nick, point, game_id, grid
                         );
-                    gameManager.UpdateGrid(player_id, state);
+                    gameController.UpdateGrid(player_id, state);
                 }
                 EventManager.GetInstance().PostNotification(EVENT_TYPE.SCORE_CHANGE, null, playerScores);
                 initGrids = true;
@@ -206,7 +205,7 @@ public class Connection : MonoBehaviour, IListener
             var param = new Dictionary<int, KeyValuePair<string, string>> { { index, playerScore } };
             EventManager.GetInstance().PostNotification(EVENT_TYPE.SCORE_CHANGE, null, param);
             var piece = data.payload["piece"];
-            gameManager.UpdateGridData(sender, gridData, piece);
+            gameController.UpdateGridData(sender, gridData, piece);
         });
     }
 
@@ -224,7 +223,7 @@ public class Connection : MonoBehaviour, IListener
             string game_id = game["id"].ToObject<string>();
             Dictionary<string, int> grid = game["player_boards"][player_id]["grid"].ToObject<Dictionary<string, int>>();
             GridState state = new GridState(player_id, player_nick, point, game_id, grid);
-            gameManager.UpdateGrid(player_id, state);
+            gameController.UpdateGrid(player_id, state);
         }
         EventManager.GetInstance().PostNotification(EVENT_TYPE.SCORE_CHANGE, null, playerScores);
     }

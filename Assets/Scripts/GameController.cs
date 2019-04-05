@@ -22,7 +22,7 @@ public struct GridState
     }
 }
 
-public class GameManager : MonoBehaviour, IListener
+public class GameController : MonoBehaviour, IListener
 {
 
     public Color[] colors;
