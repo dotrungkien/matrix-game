@@ -112,9 +112,10 @@ public class GameController : MonoBehaviour, IListener
         }
     }
 
-    public void UpdateGridData(string player_id, Dictionary<string, int> gridData, JToken piece)
+    public IEnumerator UpdateGridData(string player_id, Dictionary<string, int> gridData, JToken piece)
     {
         grids[player_id].PlacePiece(piece, tileSpawnPos);
+        yield return new WaitForSeconds(1.0f);
         grids[player_id].UpdateData(gridData);
     }
 

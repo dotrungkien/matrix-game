@@ -5,12 +5,13 @@ using System.Collections.Generic;
 public class Tile : MonoBehaviour
 {
 
-    private Vector2 startingPosition;
+
     private List<Transform> touchingTiles;
     private Transform myParent;
     private SpriteRenderer render;
     private int topVal, midVal, botVal;
-
+    [HideInInspector]
+    public Vector2 startingPosition;
     public GameObject frame;
     public Sprite[] renders;
     public SpriteRenderer top;
@@ -19,7 +20,6 @@ public class Tile : MonoBehaviour
 
     void Awake()
     {
-        startingPosition = transform.position;
         touchingTiles = new List<Transform>();
         myParent = transform.parent;
         render = GetComponent<SpriteRenderer>();
@@ -145,9 +145,9 @@ public class Tile : MonoBehaviour
         transform.position = endingPos;
 
         GridBase gridBase = transform.parent.parent.parent.GetComponent<GridBase>();
+        gridBase.UpdateLastTile(this);
         int[] cell = gridBase.PosToGrid(endingPos);
         gridBase.UpdateGridVal(cell[0], cell[1], topVal, midVal, botVal);
-        gridBase.UpdateLastTile(this);
         cell[1] = (8 - cell[1]) / 3;
         EventManager.GetInstance().PostNotification(EVENT_TYPE.PLACE_PIECE, this, cell);
         transform.tag = Constants.UNTAGGED;

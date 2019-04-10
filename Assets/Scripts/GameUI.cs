@@ -67,6 +67,7 @@ public class GameUI : MonoBehaviour, IListener
             setUsernamePanel.SetActive(false);
         }
         usernameText.text = username;
+        usernameInput.text = username;
         openCreateGame.onClick.AddListener(OpenCreateGame);
         readyButton.onClick.AddListener(Ready);
         openCreateGame.gameObject.SetActive(false);

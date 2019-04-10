@@ -160,6 +160,7 @@ public class Connection : MonoBehaviour, IListener
             EventManager.GetInstance().PostNotification(EVENT_TYPE.NEW_PIECE, this, pieceVal);
             Tile newTile = GameManager.GetInstance().SpawnNewTile(pieceVal, tileSpawnTrans.position, tileSpawnTrans, true);
             newTile.transform.DOMove(tilePlaceTrans.position, 0.5f);
+            newTile.startingPosition = tilePlaceTrans.position;
             if (!GameManager.GetInstance().isWatching)
             {
                 newTile.transform.tag = Constants.MOVABLE_TAG;
@@ -230,7 +231,7 @@ public class Connection : MonoBehaviour, IListener
             var param = new Dictionary<int, KeyValuePair<string, string>> { { index, playerScore } };
             EventManager.GetInstance().PostNotification(EVENT_TYPE.SCORE_CHANGE, null, param);
             var piece = data.payload["piece"];
-            gameController.UpdateGridData(sender, gridData, piece);
+            StartCoroutine(gameController.UpdateGridData(sender, gridData, piece));
         });
     }
 

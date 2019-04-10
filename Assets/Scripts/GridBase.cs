@@ -306,7 +306,7 @@ public class GridBase : MonoBehaviour
 
         lineRenderer.SetPosition(0, newFrom);
         lineRenderer.SetPosition(1, newTo);
-        lineRenderer.sortingLayerName = "Tile";
-        lineRenderer.sortingOrder = 5;
+        lineRenderer.sortingLayerName = "Default";
+        lineRenderer.sortingOrder = 0;
     }
 }
