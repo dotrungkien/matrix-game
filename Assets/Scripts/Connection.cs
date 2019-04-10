@@ -33,7 +33,7 @@ public class Connection : MonoBehaviour, IListener
             PlayerPrefs.SetString("myID", myID);
         }
 
-        StartCoroutine(FetchGames(Constants.FETCH_GAMES));
+        FetchGames();
         SocketConnect();
         initGrids = false;
         boardsDrawn = false;
@@ -43,7 +43,12 @@ public class Connection : MonoBehaviour, IListener
         EventManager.GetInstance().AddListener(EVENT_TYPE.WATCH_GAME, this);
     }
 
-    IEnumerator FetchGames(string uri)
+    public void FetchGames()
+    {
+        StartCoroutine(FetchGamesProcess(Constants.FETCH_GAMES));
+    }
+
+    IEnumerator FetchGamesProcess(string uri)
     {
         using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
         {
@@ -100,7 +105,7 @@ public class Connection : MonoBehaviour, IListener
         lobbyChannel = socket.MakeChannel("lobby");
         lobbyChannel.On("update_games", data =>
         {
-            Debug.Log(string.Format("------on update_games------ {0}", MessageSerialization.Serialize(data)));
+            // Debug.Log(string.Format("------on update_games------ {0}", MessageSerialization.Serialize(data)));
             var games = data.payload["games"];
             if (listGames.gameObject.activeSelf) listGames.UpdateGames(games);
         });
@@ -161,11 +166,15 @@ public class Connection : MonoBehaviour, IListener
     public void GameChannelSetup(string gameID)
     {
         gameChannel = socket.MakeChannel(string.Format("game:{0}", gameID));
+
         gameChannel.On(Message.InBoundEvent.phx_reply, data =>
         {
             if (boardsDrawn) return;
-            // Debug.Log(MessageSerialization.Serialize(data));
+            Debug.Log("On phx_reply" + MessageSerialization.Serialize(data));
             var game = data.payload["response"]["game"];
+            int[] pieceVal = data.payload["response"]["game"]["piece_values"].ToObject<int[]>();
+            Tile newTile = GameManager.GetInstance().SpawnNewTile(pieceVal, tileSpawnTrans.position, tileSpawnTrans, true);
+            newTile.transform.DOMove(tilePlaceTrans.position, 0.5f);
             gameUI.timeLimit = (int)game["time_limit"];
             DrawBoards(game);
             boardsDrawn = true;
@@ -189,7 +198,7 @@ public class Connection : MonoBehaviour, IListener
 
         gameChannel.On("game:player_joined", data =>
         {
-            // Debug.Log(string.Format("------on player_joined------ {0}", MessageSerialization.Serialize(data)));
+            Debug.Log(string.Format("------on player_joined------ {0}", MessageSerialization.Serialize(data)));
             var game = data.payload["game"];
             gameUI.timeLimit = (int)game["time_limit"];
             DrawBoards(game);
@@ -214,6 +223,7 @@ public class Connection : MonoBehaviour, IListener
         gameChannel.On("game:place_piece", data =>
         {
             var game = data.payload["game"]; ;
+            var piece = data.payload["piece"];
             string[] players = game["players"].ToObject<string[]>();
             string player_nick;
 
@@ -250,7 +260,6 @@ public class Connection : MonoBehaviour, IListener
             var playerScore = new KeyValuePair<string, string>(player_nick, pointStr);
             var param = new Dictionary<int, KeyValuePair<string, string>> { { index, playerScore } };
             EventManager.GetInstance().PostNotification(EVENT_TYPE.SCORE_CHANGE, null, param);
-            var piece = data.payload["piece"];
             StartCoroutine(gameController.UpdateGridData(sender, gridData, piece));
         });
     }

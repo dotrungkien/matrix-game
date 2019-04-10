@@ -245,8 +245,8 @@ public class GridBase : MonoBehaviour
         lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
         lineRenderer.startColor = Color.black;
         lineRenderer.endColor = Color.black;
-        lineRenderer.startWidth = 0.03f;
-        lineRenderer.endWidth = 0.03f;
+        lineRenderer.startWidth = 0.025f;
+        lineRenderer.endWidth = 0.025f;
         lineRenderer.positionCount = 2;
         lineRenderer.useWorldSpace = true;
         Vector3 newFrom = from;
