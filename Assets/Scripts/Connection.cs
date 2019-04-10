@@ -18,6 +18,7 @@ public class Connection : MonoBehaviour, IListener
     private Channel lobbyChannel;
     private Channel gameChannel;
     private bool initGrids;
+    private bool boardsDrawn;
 
     void Start()
     {
@@ -30,6 +31,7 @@ public class Connection : MonoBehaviour, IListener
 
         SocketConnect();
         initGrids = false;
+        boardsDrawn = false;
         GameManager.GetInstance().isWatching = false;
         EventManager.GetInstance().AddListener(EVENT_TYPE.PLACE_PIECE, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME, this);
@@ -43,7 +45,10 @@ public class Connection : MonoBehaviour, IListener
 
     void SocketConnect()
     {
-        socket = new Socket(new BestHTTPWebsocketFactory());
+        socket = new Socket(new BestHTTPWebsocketFactory(), new Socket.Options
+        {
+            channelRejoinInterval = TimeSpan.FromMilliseconds(200),
+        });
         Socket.OnOpenDelegate onOpenCallback = () =>
         {
             // Debug.Log("Socket on open.");
@@ -133,6 +138,15 @@ public class Connection : MonoBehaviour, IListener
     public void GameChannelSetup(string gameID)
     {
         gameChannel = socket.MakeChannel(string.Format("game:{0}", gameID));
+        gameChannel.On(Message.InBoundEvent.phx_reply, data =>
+        {
+            if (boardsDrawn) return;
+            Debug.Log(MessageSerialization.Serialize(data));
+            var game = data.payload["response"]["game"];
+            gameUI.timeLimit = (int)game["time_limit"];
+            DrawBoards(game);
+            boardsDrawn = true;
+        });
 
         gameChannel.On("game:new_piece", data =>
         {
@@ -145,7 +159,7 @@ public class Connection : MonoBehaviour, IListener
 
         gameChannel.On("game:player_joined", data =>
         {
-            Debug.Log(string.Format("------on player_joined------ {0}", MessageSerialization.Serialize(data)));
+            // Debug.Log(string.Format("------on player_joined------ {0}", MessageSerialization.Serialize(data)));
             var game = data.payload["game"];
             gameUI.timeLimit = (int)game["time_limit"];
             DrawBoards(game);
