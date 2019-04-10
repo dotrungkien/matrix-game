@@ -127,8 +127,18 @@ public class GameController : MonoBehaviour, IListener
             if (child != null) GameObject.Destroy(child.gameObject);
         }
         Tile tile = Instantiate(tilePrefab, tileSpawnPos.position, Quaternion.identity, tileSpawnPos);
-        tile.transform.tag = Constants.MOVABLE_TAG;
-        tile.GetComponent<SpriteRenderer>().color = GameManager.GetInstance().myColor;
+
+        if (GameManager.GetInstance().isWatching)
+        {
+            tile.GetComponent<SpriteRenderer>().color = colors[0];
+            tile.transform.tag = Constants.UNTAGGED;
+        }
+        else
+        {
+            Color myColor = GameManager.GetInstance().myColor;
+            tile.transform.tag = Constants.MOVABLE_TAG;
+        }
+
         tile.SetVal(piece);
     }
 
@@ -158,7 +168,7 @@ public class GameController : MonoBehaviour, IListener
             case EVENT_TYPE.NEW_PIECE:
                 int[] pieceVal = (int[])param;
                 bool isWatching = GameManager.GetInstance().isWatching;
-                if (!isWatching) SpawnNewTile(pieceVal);
+                SpawnNewTile(pieceVal);
                 break;
             default:
                 break;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json.Linq;
+using DG.Tweening;
 
 public class GridBase : MonoBehaviour
 {
@@ -177,7 +178,7 @@ public class GridBase : MonoBehaviour
                 int bot = grid[i, j - 1];
                 Vector3 placePos = GridToPos(new int[2] { i, j });
                 Tile newTile = Instantiate(renderTile, placePos, Quaternion.identity, transform);
-                newTile.GetComponent<SpriteRenderer>().enabled = false;
+                newTile.GetComponent<SpriteRenderer>().color = color;
                 newTile.SetVal(new int[] { top, mid, bot });
             }
         }
@@ -203,6 +204,10 @@ public class GridBase : MonoBehaviour
         Tile newTile = Instantiate(renderTile, placePos, Quaternion.identity, transform);
         newTile.GetComponent<SpriteRenderer>().color = color;
         newTile.SetVal(piece["values"].ToObject<int[]>());
+        Sequence mySequence = DOTween.Sequence();
+
+        mySequence.Append(newTile.transform.DOScale(new Vector3(1.3f, 1.3f, 1.3f), 1.0f));
+        mySequence.Append(newTile.transform.DOScale(new Vector3(1.0f, 1.0f, 1.0f), 1.0f));
     }
 
     public void UpdateData(Dictionary<string, int> gridData)
