@@ -105,7 +105,7 @@ public class GameController : MonoBehaviour, IListener
             else
             {
                 Transform otherGrid = item.Value.transform;
-                Debug.Log(string.Format("{0} {1} {2}", currentGrid.parent.name, otherGrid.parent.name, Object.ReferenceEquals(currentGrid.parent, otherGrid.parent)));
+                // Debug.Log(string.Format("{0} {1} {2}", currentGrid.parent.name, otherGrid.parent.name, Object.ReferenceEquals(currentGrid.parent, otherGrid.parent)));
                 if (gridName != username && currentGrid != null && Object.ReferenceEquals(currentGrid.parent, otherGrid.parent))
                 {
                     item.Value.gameObject.SetActive(false);
@@ -135,7 +135,7 @@ public class GameController : MonoBehaviour, IListener
         }
         else
         {
-            Color myColor = GameManager.GetInstance().myColor;
+            tile.GetComponent<SpriteRenderer>().color = GameManager.GetInstance().myColor;
             tile.transform.tag = Constants.MOVABLE_TAG;
         }
 

@@ -201,13 +201,18 @@ public class GridBase : MonoBehaviour
         int x = (int)piece["x"];
         int y = dim - 2 - (int)piece["y"];
         Vector3 placePos = GridToPos(new int[2] { x, y });
-        Tile newTile = Instantiate(renderTile, placePos, Quaternion.identity, transform);
+        Tile newTile = Instantiate(renderTile, GameManager.GetInstance().tileSpawnPos.position, Quaternion.identity, transform);
         newTile.GetComponent<SpriteRenderer>().color = color;
         newTile.SetVal(piece["values"].ToObject<int[]>());
-        Sequence mySequence = DOTween.Sequence();
-
-        mySequence.Append(newTile.transform.DOScale(new Vector3(1.3f, 1.3f, 1.3f), 1.0f));
-        mySequence.Append(newTile.transform.DOScale(new Vector3(1.0f, 1.0f, 1.0f), 1.0f));
+        if (gameObject.name != PlayerPrefs.GetString("username"))
+        {
+            // Sequence mySequence = DOTween.Sequence();
+            // mySequence.Append(newTile.transform.DOScale(new Vector3(1.3f, 1.3f, 1.3f), 1.0f));
+            // mySequence.Append(newTile.transform.DOScale(new Vector3(1.0f, 1.0f, 1.0f), 1.0f));
+            // mySequence.Append(newTile.transform.DOScale(new Vector3(1.3f, 1.3f, 1.3f), 1.0f));
+            // mySequence.Append(newTile.transform.DOScale(new Vector3(1.0f, 1.0f, 1.0f), 1.0f));
+            newTile.transform.DOMove(placePos, 1.0f);
+        }
     }
 
     public void UpdateData(Dictionary<string, int> gridData)

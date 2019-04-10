@@ -141,7 +141,7 @@ public class Connection : MonoBehaviour, IListener
         gameChannel.On(Message.InBoundEvent.phx_reply, data =>
         {
             if (boardsDrawn) return;
-            Debug.Log(MessageSerialization.Serialize(data));
+            // Debug.Log(MessageSerialization.Serialize(data));
             var game = data.payload["response"]["game"];
             gameUI.timeLimit = (int)game["time_limit"];
             DrawBoards(game);

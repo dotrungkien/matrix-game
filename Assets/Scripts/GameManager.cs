@@ -8,4 +8,5 @@ public class GameManager : Singleton<GameManager>
     public Color myColor;
     [HideInInspector]
     public bool isWatching = false;
+    public Transform tileSpawnPos;
 }
