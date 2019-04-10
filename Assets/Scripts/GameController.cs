@@ -24,6 +24,8 @@ public struct GridState
 
 public class GameController : MonoBehaviour, IListener
 {
+    public Transform tileSpawnPos;
+
     public GridBase gridPrefab;
     public Transform grid1SpawnPos;
     public Transform grid2SpawnPos;
@@ -112,7 +114,7 @@ public class GameController : MonoBehaviour, IListener
 
     public void UpdateGridData(string player_id, Dictionary<string, int> gridData, JToken piece)
     {
-        grids[player_id].PlacePiece(piece);
+        grids[player_id].PlacePiece(piece, tileSpawnPos);
         grids[player_id].UpdateData(gridData);
     }
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Phoenix;
 using Newtonsoft.Json.Linq;
+using DG.Tweening;
 
 public class Connection : MonoBehaviour, IListener
 {
@@ -14,6 +15,7 @@ public class Connection : MonoBehaviour, IListener
     public GameUI gameUI;
     public ListGames listGames;
     public Transform tileSpawnTrans;
+    public Transform tilePlaceTrans;
 
     private Socket socket = null;
     private Channel lobbyChannel;
@@ -157,6 +159,7 @@ public class Connection : MonoBehaviour, IListener
             SoundManager.GetInstance().MakeClickSound();
             EventManager.GetInstance().PostNotification(EVENT_TYPE.NEW_PIECE, this, pieceVal);
             Tile newTile = GameManager.GetInstance().SpawnNewTile(pieceVal, tileSpawnTrans.position, tileSpawnTrans, true);
+            newTile.transform.DOMove(tilePlaceTrans.position, 0.5f);
             if (!GameManager.GetInstance().isWatching)
             {
                 newTile.transform.tag = Constants.MOVABLE_TAG;

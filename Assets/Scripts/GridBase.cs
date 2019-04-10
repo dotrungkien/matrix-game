@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json.Linq;
-// using DG.Tweening;
+using DG.Tweening;
 
 public class GridBase : MonoBehaviour
 {
@@ -12,6 +12,7 @@ public class GridBase : MonoBehaviour
     public float cellSize = 0.4f;
     int[,] grid = new int[9, 9];
     private int dim = 9;
+    private Tile lastTile = null;
 
     public int[] KeyToGrid(string key)
     {
@@ -196,15 +197,32 @@ public class GridBase : MonoBehaviour
         UpdateStatus();
     }
 
-    public void PlacePiece(JToken piece)
+    public void PlacePiece(JToken piece, Transform spawnPos)
     {
+
         int x = (int)piece["x"];
         int y = dim - 2 - (int)piece["y"];
         Vector3 placePos = GridToPos(new int[2] { x, y });
         int[] pieceVal = piece["values"].ToObject<int[]>();
-        Tile newTile = GameManager.GetInstance().SpawnNewTile(pieceVal, placePos, transform);
+        Tile newTile = GameManager.GetInstance().SpawnNewTile(pieceVal, spawnPos.position, transform);
         newTile.SetColor(color);
-        // if (gameObject.name != PlayerPrefs.GetString("username")) newTile.transform.DOMove(placePos, 1.0f);
+        if (gameObject.name != PlayerPrefs.GetString("username"))
+        {
+            newTile.transform.DOMove(placePos, 1.0f);
+        }
+        else
+        {
+            newTile.transform.position = placePos;
+        }
+        UpdateLastTile(newTile);
+
+    }
+
+    public void UpdateLastTile(Tile newTile)
+    {
+        if (lastTile != null) lastTile.DisableFrame();
+        newTile.EnableFrame();
+        lastTile = newTile;
     }
 
     public void UpdateData(Dictionary<string, int> gridData)

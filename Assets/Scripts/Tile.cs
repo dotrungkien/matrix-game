@@ -11,6 +11,7 @@ public class Tile : MonoBehaviour
     private SpriteRenderer render;
     private int topVal, midVal, botVal;
 
+    public GameObject frame;
     public Sprite[] renders;
     public SpriteRenderer top;
     public SpriteRenderer mid;
@@ -22,6 +23,7 @@ public class Tile : MonoBehaviour
         touchingTiles = new List<Transform>();
         myParent = transform.parent;
         render = GetComponent<SpriteRenderer>();
+        DisableFrame();
     }
 
     public void SetVal(int[] val)
@@ -37,6 +39,16 @@ public class Tile : MonoBehaviour
     public void SetColor(Color color)
     {
         render.color = color;
+    }
+
+    public void DisableFrame()
+    {
+        frame.SetActive(false);
+    }
+
+    public void EnableFrame()
+    {
+        frame.SetActive(true);
     }
 
     public void PickUp()
@@ -135,6 +147,7 @@ public class Tile : MonoBehaviour
         GridBase gridBase = transform.parent.parent.parent.GetComponent<GridBase>();
         int[] cell = gridBase.PosToGrid(endingPos);
         gridBase.UpdateGridVal(cell[0], cell[1], topVal, midVal, botVal);
+        gridBase.UpdateLastTile(this);
         cell[1] = (8 - cell[1]) / 3;
         EventManager.GetInstance().PostNotification(EVENT_TYPE.PLACE_PIECE, this, cell);
         transform.tag = Constants.UNTAGGED;
