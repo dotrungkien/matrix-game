@@ -4,5 +4,8 @@ using UnityEngine;
 
 public class GameManager : Singleton<GameManager>
 {
+    [HideInInspector]
+    public Color myColor;
+    [HideInInspector]
     public bool isWatching = false;
 }

@@ -6,6 +6,8 @@ using Newtonsoft.Json.Linq;
 public class GridBase : MonoBehaviour
 {
     public Tile renderTile;
+    [HideInInspector]
+    public Color color;
     public float cellSize = 0.4f;
     int[,] grid = new int[9, 9];
     private int dim = 9;
@@ -199,7 +201,7 @@ public class GridBase : MonoBehaviour
         int y = dim - 2 - (int)piece["y"];
         Vector3 placePos = GridToPos(new int[2] { x, y });
         Tile newTile = Instantiate(renderTile, placePos, Quaternion.identity, transform);
-        newTile.GetComponent<SpriteRenderer>().enabled = false;
+        newTile.GetComponent<SpriteRenderer>().color = color;
         newTile.SetVal(piece["values"].ToObject<int[]>());
     }
 

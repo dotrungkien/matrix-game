@@ -36,7 +36,6 @@ public class GameController : MonoBehaviour, IListener
     public bool isGameOver = false;
 
     private string myID;
-    private Color myColor;
     public Dictionary<string, GridBase> grids = new Dictionary<string, GridBase>();
 
     private Dictionary<string, string> nickToID;
@@ -78,10 +77,11 @@ public class GameController : MonoBehaviour, IListener
             if (isMe)
             {
                 target.transform.tag = Constants.PLACEABLE_TAG;
-                myColor = colors[grids.Count];
+                GameManager.GetInstance().myColor = colors[grids.Count];
             }
             SpriteRenderer render = target.GetComponent<SpriteRenderer>();
-            render.color = colors[grids.Count];
+
+            target.color = colors[grids.Count];
             grids[player_id] = target;
             nickToID[player_nick] = player_id;
             if (!isMe) ActiveGrid(player_nick);
@@ -120,7 +120,7 @@ public class GameController : MonoBehaviour, IListener
         grids[player_id].UpdateData(gridData);
     }
 
-    public void SpawnNewTiles(int[] piece)
+    public void SpawnNewTile(int[] piece)
     {
         foreach (Transform child in tileSpawnPos.transform)
         {
@@ -128,7 +128,7 @@ public class GameController : MonoBehaviour, IListener
         }
         Tile tile = Instantiate(tilePrefab, tileSpawnPos.position, Quaternion.identity, tileSpawnPos);
         tile.transform.tag = Constants.MOVABLE_TAG;
-        tile.GetComponent<SpriteRenderer>().color = myColor;
+        tile.GetComponent<SpriteRenderer>().color = GameManager.GetInstance().myColor;
         tile.SetVal(piece);
     }
 
@@ -158,7 +158,7 @@ public class GameController : MonoBehaviour, IListener
             case EVENT_TYPE.NEW_PIECE:
                 int[] pieceVal = (int[])param;
                 bool isWatching = GameManager.GetInstance().isWatching;
-                if (!isWatching) SpawnNewTiles(pieceVal);
+                if (!isWatching) SpawnNewTile(pieceVal);
                 break;
             default:
                 break;
