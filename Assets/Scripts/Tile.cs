@@ -16,7 +16,7 @@ public class Tile : MonoBehaviour
     public SpriteRenderer mid;
     public SpriteRenderer bot;
 
-    void Start()
+    void Awake()
     {
         startingPosition = transform.position;
         touchingTiles = new List<Transform>();
@@ -32,6 +32,11 @@ public class Tile : MonoBehaviour
         mid.sprite = renders[midVal];
         botVal = val[2];
         bot.sprite = renders[botVal];
+    }
+
+    public void SetColor(Color color)
+    {
+        render.color = color;
     }
 
     public void PickUp()

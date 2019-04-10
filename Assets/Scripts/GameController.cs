@@ -24,16 +24,12 @@ public struct GridState
 
 public class GameController : MonoBehaviour, IListener
 {
-
-    public Color[] colors;
-    public Tile tilePrefab;
-    public Transform tileSpawnPos;
-
     public GridBase gridPrefab;
     public Transform grid1SpawnPos;
     public Transform grid2SpawnPos;
 
     public bool isGameOver = false;
+    public Color[] colors;
 
     private string myID;
     public Dictionary<string, GridBase> grids = new Dictionary<string, GridBase>();
@@ -120,28 +116,6 @@ public class GameController : MonoBehaviour, IListener
         grids[player_id].UpdateData(gridData);
     }
 
-    public void SpawnNewTile(int[] piece)
-    {
-        foreach (Transform child in tileSpawnPos.transform)
-        {
-            if (child != null) GameObject.Destroy(child.gameObject);
-        }
-        Tile tile = Instantiate(tilePrefab, tileSpawnPos.position, Quaternion.identity, tileSpawnPos);
-
-        if (GameManager.GetInstance().isWatching)
-        {
-            tile.GetComponent<SpriteRenderer>().color = colors[0];
-            tile.transform.tag = Constants.UNTAGGED;
-        }
-        else
-        {
-            tile.GetComponent<SpriteRenderer>().color = GameManager.GetInstance().myColor;
-            tile.transform.tag = Constants.MOVABLE_TAG;
-        }
-
-        tile.SetVal(piece);
-    }
-
     public void GameOver()
     {
         isGameOver = true;
@@ -164,11 +138,6 @@ public class GameController : MonoBehaviour, IListener
                 break;
             case EVENT_TYPE.RESTART:
                 Restart();
-                break;
-            case EVENT_TYPE.NEW_PIECE:
-                int[] pieceVal = (int[])param;
-                bool isWatching = GameManager.GetInstance().isWatching;
-                SpawnNewTile(pieceVal);
                 break;
             default:
                 break;

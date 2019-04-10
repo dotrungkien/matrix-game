@@ -13,6 +13,7 @@ public class Connection : MonoBehaviour, IListener
     public GameController gameController;
     public GameUI gameUI;
     public ListGames listGames;
+    public Transform tileSpawnTrans;
 
     private Socket socket = null;
     private Channel lobbyChannel;
@@ -155,6 +156,11 @@ public class Connection : MonoBehaviour, IListener
             int[] pieceVal = piece.ToObject<int[]>();
             SoundManager.GetInstance().MakeClickSound();
             EventManager.GetInstance().PostNotification(EVENT_TYPE.NEW_PIECE, this, pieceVal);
+            Tile newTile = GameManager.GetInstance().SpawnNewTile(pieceVal, tileSpawnTrans.position, tileSpawnTrans, true);
+            if (!GameManager.GetInstance().isWatching)
+            {
+                newTile.transform.tag = Constants.MOVABLE_TAG;
+            }
         });
 
         gameChannel.On("game:player_joined", data =>

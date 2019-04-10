@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json.Linq;
-using DG.Tweening;
+// using DG.Tweening;
 
 public class GridBase : MonoBehaviour
 {
@@ -201,18 +201,10 @@ public class GridBase : MonoBehaviour
         int x = (int)piece["x"];
         int y = dim - 2 - (int)piece["y"];
         Vector3 placePos = GridToPos(new int[2] { x, y });
-        Tile newTile = Instantiate(renderTile, GameManager.GetInstance().tileSpawnPos.position, Quaternion.identity, transform);
-        newTile.GetComponent<SpriteRenderer>().color = color;
-        newTile.SetVal(piece["values"].ToObject<int[]>());
-        if (gameObject.name != PlayerPrefs.GetString("username"))
-        {
-            // Sequence mySequence = DOTween.Sequence();
-            // mySequence.Append(newTile.transform.DOScale(new Vector3(1.3f, 1.3f, 1.3f), 1.0f));
-            // mySequence.Append(newTile.transform.DOScale(new Vector3(1.0f, 1.0f, 1.0f), 1.0f));
-            // mySequence.Append(newTile.transform.DOScale(new Vector3(1.3f, 1.3f, 1.3f), 1.0f));
-            // mySequence.Append(newTile.transform.DOScale(new Vector3(1.0f, 1.0f, 1.0f), 1.0f));
-            newTile.transform.DOMove(placePos, 1.0f);
-        }
+        int[] pieceVal = piece["values"].ToObject<int[]>();
+        Tile newTile = GameManager.GetInstance().SpawnNewTile(pieceVal, placePos, transform);
+        newTile.SetColor(color);
+        // if (gameObject.name != PlayerPrefs.GetString("username")) newTile.transform.DOMove(placePos, 1.0f);
     }
 
     public void UpdateData(Dictionary<string, int> gridData)
