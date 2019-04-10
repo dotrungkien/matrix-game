@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using Phoenix;
 using Newtonsoft.Json.Linq;
 using DG.Tweening;
@@ -32,6 +33,7 @@ public class Connection : MonoBehaviour, IListener
             PlayerPrefs.SetString("myID", myID);
         }
 
+        StartCoroutine(FetchGames(Constants.FETCH_GAMES));
         SocketConnect();
         initGrids = false;
         boardsDrawn = false;
@@ -39,6 +41,24 @@ public class Connection : MonoBehaviour, IListener
         EventManager.GetInstance().AddListener(EVENT_TYPE.PLACE_PIECE, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.JOIN_GAME, this);
         EventManager.GetInstance().AddListener(EVENT_TYPE.WATCH_GAME, this);
+    }
+
+    IEnumerator FetchGames(string uri)
+    {
+        using (UnityWebRequest webRequest = UnityWebRequest.Get(uri))
+        {
+            yield return webRequest.SendWebRequest();
+            if (webRequest.isNetworkError)
+            {
+                Debug.Log("Error: " + webRequest.error);
+            }
+            else
+            {
+                Debug.Log("Received: " + webRequest.downloadHandler.text);
+                JToken games = JToken.Parse(webRequest.downloadHandler.text)["data"];
+                if (listGames.gameObject.activeSelf) listGames.UpdateGames(games);
+            }
+        }
     }
 
     public void SocketDisconnect()
@@ -80,7 +100,7 @@ public class Connection : MonoBehaviour, IListener
         lobbyChannel = socket.MakeChannel("lobby");
         lobbyChannel.On("update_games", data =>
         {
-            // Debug.Log(string.Format("------on update_games------ {0}", MessageSerialization.Serialize(data)));
+            Debug.Log(string.Format("------on update_games------ {0}", MessageSerialization.Serialize(data)));
             var games = data.payload["games"];
             if (listGames.gameObject.activeSelf) listGames.UpdateGames(games);
         });
