@@ -62,7 +62,7 @@ public class GameInfo : MonoBehaviour
 
     public void JoinGameNormal()
     {
-        SoundManager.GetInstance().MakeClickSound();
+        // SoundManager.GetInstance().MakeClickSound();
         JoinGame("");
         joinGameNormal.onClick.RemoveListener(JoinGameNormal);
     }
@@ -80,7 +80,7 @@ public class GameInfo : MonoBehaviour
 
     public void WatchGame()
     {
-        SoundManager.GetInstance().MakeClickSound();
+        // SoundManager.GetInstance().MakeClickSound();
         EventManager.GetInstance().PostNotification(EVENT_TYPE.WATCH_GAME, this, gameID);
         Debug.Log(string.Format("Watching game {0}", gameID));
     }

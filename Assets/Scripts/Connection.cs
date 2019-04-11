@@ -59,7 +59,7 @@ public class Connection : MonoBehaviour, IListener
             }
             else
             {
-                Debug.Log("Received: " + webRequest.downloadHandler.text);
+                // Debug.Log("Received: " + webRequest.downloadHandler.text);
                 JToken games = JToken.Parse(webRequest.downloadHandler.text)["data"];
                 if (listGames.gameObject.activeSelf) listGames.UpdateGames(games);
             }
@@ -170,7 +170,7 @@ public class Connection : MonoBehaviour, IListener
         gameChannel.On(Message.InBoundEvent.phx_reply, data =>
         {
             if (boardsDrawn) return;
-            Debug.Log("On phx_reply" + MessageSerialization.Serialize(data));
+            // Debug.Log("On phx_reply" + MessageSerialization.Serialize(data));
             var game = data.payload["response"]["game"];
             int[] pieceVal = data.payload["response"]["game"]["piece_values"].ToObject<int[]>();
             Tile newTile = GameManager.GetInstance().SpawnNewTile(pieceVal, tileSpawnTrans.position, tileSpawnTrans, true);
@@ -185,7 +185,7 @@ public class Connection : MonoBehaviour, IListener
             // Debug.Log(string.Format("------on new_piece------ {0}", MessageSerialization.Serialize(data)));
             var piece = data.payload["piece"];
             int[] pieceVal = piece.ToObject<int[]>();
-            SoundManager.GetInstance().MakeClickSound();
+            // SoundManager.GetInstance().MakeClickSound();
             EventManager.GetInstance().PostNotification(EVENT_TYPE.NEW_PIECE, this, pieceVal);
             Tile newTile = GameManager.GetInstance().SpawnNewTile(pieceVal, tileSpawnTrans.position, tileSpawnTrans, true);
             newTile.transform.DOMove(tilePlaceTrans.position, 0.5f);
@@ -205,7 +205,7 @@ public class Connection : MonoBehaviour, IListener
         });
         gameChannel.On("game:stopped", data =>
         {
-            Debug.Log(MessageSerialization.Serialize(data));
+            // Debug.Log("------on game_stopped------" + MessageSerialization.Serialize(data));
             EventManager.GetInstance().PostNotification(EVENT_TYPE.GAMEOVER);
         });
         gameChannel.On("game:player_left", data =>

@@ -118,7 +118,7 @@ public class GameUI : MonoBehaviour, IListener
 
     public void OpenCreateGame()
     {
-        SoundManager.GetInstance().MakeClickSound();
+        // SoundManager.GetInstance().MakeClickSound();
         createGamePanel.SetActive(true);
     }
 
@@ -130,7 +130,7 @@ public class GameUI : MonoBehaviour, IListener
 
     public void Ready()
     {
-        SoundManager.GetInstance().MakeClickSound();
+        // SoundManager.GetInstance().MakeClickSound();
         readyPanel.SetActive(false);
         readyButton.gameObject.SetActive(false);
         connection.SetReady();
@@ -138,7 +138,7 @@ public class GameUI : MonoBehaviour, IListener
 
     void SetName()
     {
-        SoundManager.GetInstance().MakeClickSound();
+        // SoundManager.GetInstance().MakeClickSound();
         string username = usernameInput.text;
         if (username == "") return;
         PlayerPrefs.SetString("username", username);

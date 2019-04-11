@@ -141,7 +141,7 @@ public class Tile : MonoBehaviour
             elapsedTime += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
-        SoundManager.GetInstance().MakeTileSound();
+        // SoundManager.GetInstance().MakeTileSound();
         transform.position = endingPos;
 
         GridBase gridBase = transform.parent.parent.parent.GetComponent<GridBase>();
