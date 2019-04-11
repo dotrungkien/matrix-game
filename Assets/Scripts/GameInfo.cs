@@ -17,11 +17,12 @@ public class GameInfo : MonoBehaviour
     public Text playersLabel;
     public Text modeLabel;
     public Text turnLabel;
-
+    public GameObject[] players;
 
     private string gameID;
     private bool isLocked;
     private string password;
+
 
     void Start()
     {
@@ -31,7 +32,7 @@ public class GameInfo : MonoBehaviour
         watchGameButton.onClick.AddListener(WatchGame);
     }
 
-    public void Setup(string _gameID, int spectators, int timeLimit, bool locked, bool isFull, string playerText, string mode, int turn)
+    public void Setup(string _gameID, int spectators, int timeLimit, bool locked, bool isFull, string playerText, string mode, int turn, string[] player_nicks)
     {
         gameID = _gameID;
         gameLabel.text = _gameID;
@@ -57,6 +58,11 @@ public class GameInfo : MonoBehaviour
             modeLabel.text = "5 → 10";
         }
         turnLabel.text = "" + turn;
+        for (int i = 0; i < player_nicks.Length; i++)
+        {
+            players[i].GetComponentInChildren<Text>().text = player_nicks[i];
+            players[i].SetActive(true);
+        }
     }
 
 

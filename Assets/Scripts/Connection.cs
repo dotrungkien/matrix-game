@@ -33,7 +33,6 @@ public class Connection : MonoBehaviour, IListener
             PlayerPrefs.SetString("myID", myID);
         }
 
-        FetchGames();
         SocketConnect();
         initGrids = false;
         boardsDrawn = false;
@@ -59,7 +58,7 @@ public class Connection : MonoBehaviour, IListener
             }
             else
             {
-                // Debug.Log("Received: " + webRequest.downloadHandler.text);
+                Debug.Log("Received: " + webRequest.downloadHandler.text);
                 JToken games = JToken.Parse(webRequest.downloadHandler.text)["data"];
                 if (listGames.gameObject.activeSelf) listGames.UpdateGames(games);
             }
@@ -80,6 +79,7 @@ public class Connection : MonoBehaviour, IListener
         Socket.OnOpenDelegate onOpenCallback = () =>
         {
             // Debug.Log("Socket on open.");
+            FetchGames();
             JoinLobby();
         };
         Socket.OnClosedDelegate onCloseCallback = (code, message) => Debug.Log(string.Format("Socket on close. {0} {1}", code, message));
@@ -172,10 +172,15 @@ public class Connection : MonoBehaviour, IListener
             if (boardsDrawn) return;
             // Debug.Log("On phx_reply" + MessageSerialization.Serialize(data));
             var game = data.payload["response"]["game"];
-            int[] pieceVal = data.payload["response"]["game"]["piece_values"].ToObject<int[]>();
-            Tile newTile = GameManager.GetInstance().SpawnNewTile(pieceVal, tileSpawnTrans.position, tileSpawnTrans, true);
-            newTile.transform.DOMove(tilePlaceTrans.position, 0.5f);
+
+            if (GameManager.GetInstance().isWatching)
+            {
+                int[] pieceVal = data.payload["response"]["game"]["piece_values"].ToObject<int[]>();
+                Tile newTile = GameManager.GetInstance().SpawnNewTile(pieceVal, tileSpawnTrans.position, tileSpawnTrans, true);
+                newTile.transform.DOMove(tilePlaceTrans.position, 0.5f);
+            }
             gameUI.timeLimit = (int)game["time_limit"];
+            gameUI.timingText.text = (string)game["time_limit"];
             DrawBoards(game);
             boardsDrawn = true;
         });

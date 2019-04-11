@@ -37,9 +37,10 @@ public class ListGames : MonoBehaviour
             int maxPlayer = (int)game["max_player"];
             bool isFull = players.Length == maxPlayer;
             string playersText = string.Format("{0} / {1}", players.Length, maxPlayer);
+            string[] player_nicks = game["player_nicks"].ToObject<string[]>();
 
             GameInfo gameInfo = Instantiate(gameInfoPrefab, gameInfoPrefab.transform.position, Quaternion.identity, contentPanel);
-            gameInfo.Setup(gameID, spectators.Length, timeLimit, locked, isFull, playersText, mode, turn);
+            gameInfo.Setup(gameID, spectators.Length, timeLimit, locked, isFull, playersText, mode, turn, player_nicks);
         }
     }
 }

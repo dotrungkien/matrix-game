@@ -208,7 +208,7 @@ public class GridBase : MonoBehaviour
         newTile.SetColor(color);
         if (gameObject.name != PlayerPrefs.GetString("username"))
         {
-            newTile.transform.DOMove(placePos, 1.0f);
+            newTile.transform.DOMove(placePos, 0.5f);
         }
         else
         {

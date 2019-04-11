@@ -38,7 +38,7 @@ public class Tile : MonoBehaviour
 
     public void SetColor(Color color)
     {
-        render.color = color;
+        GetComponent<SpriteRenderer>().color = color;
     }
 
     public void DisableFrame()
