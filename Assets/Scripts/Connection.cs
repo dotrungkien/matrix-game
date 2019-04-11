@@ -34,7 +34,6 @@ public class Connection : MonoBehaviour, IListener
         //     PlayerPrefs.SetString("myID", myID);
         // }
         SocketConnect();
-        // StartCoroutine(CheckConnectStatus());
         initGrids = false;
         boardsDrawn = false;
         GameManager.GetInstance().isWatching = false;
@@ -66,43 +65,16 @@ public class Connection : MonoBehaviour, IListener
         }
     }
 
-    IEnumerator CheckConnectStatus()
-    {
-        while (true)
-        {
-            if (socket != null) Debug.Log("socket state" + socket.state.ToString());
-            if (socket == null || (socket.state != Socket.State.Open && socket.state != Socket.State.Connecting))
-            {
-                Debug.Log("Reconnecting....");
-                gameUI.SocketReconnect();
-                SocketReconnect();
-            }
-            yield return new WaitForSeconds(3.0f);
-        }
-    }
-
     public void SocketDisconnect()
     {
         socket.Disconnect();
-    }
-
-    void SocketReconnect()
-    {
-        if (socket == null) SocketConnect();
-        else
-        {
-            myID = System.Guid.NewGuid().ToString();
-            PlayerPrefs.SetString("myID", myID);
-            Dictionary<string, string> socketArgument = new Dictionary<string, string>();
-            socketArgument["id"] = myID;
-            socket.Connect("wss://matrix.heasygame.com/socket", socketArgument);
-        }
     }
 
     void SocketConnect()
     {
         socket = new Socket(new BestHTTPWebsocketFactory(), new Socket.Options
         {
+            heartbeatInterval = TimeSpan.FromSeconds(3),
             channelRejoinInterval = TimeSpan.FromMilliseconds(200),
         });
         Socket.OnOpenDelegate onOpenCallback = () =>
