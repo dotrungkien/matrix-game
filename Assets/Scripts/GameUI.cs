@@ -18,6 +18,7 @@ public class GameUI : MonoBehaviour, IListener
     // lobby panel
     public Text usernameText;
     public GameObject lobbyPanel;
+    public GameObject loading;
     public Button openCreateGame;
     public GameObject createGamePanel;
     public GameObject passwordPanel;
@@ -74,6 +75,7 @@ public class GameUI : MonoBehaviour, IListener
 
         readyPanel.SetActive(true);
         lobbyPanel.SetActive(true);
+        loading.SetActive(true);
         gamePanel.SetActive(false);
         gameOverPanel.SetActive(false);
         createGamePanel.SetActive(false);
@@ -101,6 +103,12 @@ public class GameUI : MonoBehaviour, IListener
             // int milSecond = (int)(playTime % 1000) / 10;
             timingText.text = string.Format("{0:00}", second);
         }
+    }
+
+    public void SocketReconnect()
+    {
+        loading.SetActive(true);
+        openCreateGame.gameObject.SetActive(false);
     }
 
     public void ResetTime()
@@ -153,6 +161,7 @@ public class GameUI : MonoBehaviour, IListener
         {
             case EVENT_TYPE.SOCKET_READY:
                 openCreateGame.gameObject.SetActive(true);
+                loading.SetActive(false);
                 break;
 
             case EVENT_TYPE.NEW_PIECE:
