@@ -14,6 +14,11 @@ public class InputManager : MonoBehaviour
     {
         gameController = GetComponent<GameController>();
         if (gameController.isGameOver) return;
+        foreach (Touch touch in Input.touches)
+        {
+            int id = touch.fingerId;
+            if (EventSystem.current.IsPointerOverGameObject(id)) return;
+        }
         if (Input.GetMouseButton(0))
         {
             if (EventSystem.current.IsPointerOverGameObject()) return;

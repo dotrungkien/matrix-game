@@ -27,12 +27,12 @@ public class Connection : MonoBehaviour, IListener
 
     void Start()
     {
-        // myID = PlayerPrefs.GetString("myID", "");
-        // if (myID == "")
-        // {
-        //     myID = System.Guid.NewGuid().ToString();
-        //     PlayerPrefs.SetString("myID", myID);
-        // }
+        myID = PlayerPrefs.GetString("myID", "");
+        if (myID == "")
+        {
+            myID = System.Guid.NewGuid().ToString();
+            PlayerPrefs.SetString("myID", myID);
+        }
         SocketConnect();
         initGrids = false;
         boardsDrawn = false;
